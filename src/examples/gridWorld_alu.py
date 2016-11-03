@@ -89,11 +89,18 @@ class gridWorld():
 			action = random.choice(possible_actions)
 			new_state = self.move(state,action)
 			# 3) Calculo el nuevo valor de Q(s,a)
-			self.Q[new_state[0]][new_state[1]][action] = ...
+			mx = np.max(map(lambda x : self.Q[new_state[0]][new_state[1]][x], self.possibleActions(new_state)))
+			r = self.reward(state,action)
+			self.Q[state[0]][state[1]][action] += self.alpha * (r + self.gamma * mx - self.Q[state[0]][state[1]][action])
 	
 			# 4) Actualizo s
 			state = new_state
-	
+		for x in self.Q:
+			for d in x:
+				t = ""
+				for a in d:
+					t = t + "[" + "]" + a + ": " + str(int(d[a])) + " "
+				print t
 		
 	
 	""" Funcion para plotear la Q"""
@@ -123,7 +130,9 @@ class gridWorld():
 		pylab.xlim(-1,self.width-1)
 		pylab.ylim(0,self.height)
 		pylab.xticks(range(self.width),map(str,range(self.width)))
-		pylab.yticks(range(self.height+1),reversed(map(str,range(self.height+1))))
+		rever = map(str,range(self.height+1))
+		reversed(rever)
+		pylab.yticks(range(self.height+1),rever)
 		pylab.grid(color='r', linestyle='-', linewidth=2)
 		pylab.title('Q (learning_step:%d)' % self.learning_step,size=16)
 		fig.tight_layout()		
@@ -140,7 +149,7 @@ if __name__ == "__main__":
 	gw =gridWorld(height=4,width=4,goals=[[2,2]])
 
 	# Entreno 1K veces
-	for epoch in range(1000):
+	for epoch in range(10):
 		# Ploteo la matrix a los 10,200, y 999 epochs
 		if epoch==10: gw.draw()
 		if epoch==200: gw.draw()
