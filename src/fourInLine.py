@@ -4,7 +4,9 @@ import random
 class FourInLine:
     def __init__(self, playerX, playerO, width, height):
         self.height = height
-        self.board = [[]]*width
+        self.board = []
+        for i in range(width):
+            self.board.append([])
         self.red, self.blue = playerX, playerO
         self.turn = random.choice(['B', 'Y'])
 
@@ -47,13 +49,13 @@ class FourInLine:
         return not any([len(column) < self.height for column in self.board])
 
     def display_board(self):
-        for j in range(self.height-1,-1,-1): 
+        for j in range(self.height-1,-1,-1):
             row = "|"
             for i in range(len(self.board)):
-                if len(self.board[i]) < self.height:
+                if len(self.board[i]) <= self.height:
                     row += " |"
                 else:
-                    row += str(self.board[i][j])
+                    row += str(self.board[i][j]) + "|"
             print (row)
 
 class Player(object):
@@ -105,7 +107,7 @@ class RandomPlayer(Player):
 #p2.epsilon = 0
 
 p1 = Player()
-p2 = RandomPlayer()
+p2 = Player()
 
 while True:
     t = FourInLine(p1, p2, 5, 2)
