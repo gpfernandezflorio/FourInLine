@@ -227,7 +227,7 @@ class QLearningPlayer(Player):
 p1 = QLearningPlayer()
 p2 = QLearningPlayer()
 
-for i in xrange(0,200000):
+for i in xrange(0,200):
     t = TicTacToe(p1, p2)
     t.play_game()
 
