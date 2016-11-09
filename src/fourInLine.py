@@ -34,10 +34,12 @@ class FourInLine:
             if self.player_wins(char,column):
                 player.reward(1, self.board,self.height)
                 other_player.reward(-1, self.board,self.height)
+                self.display_board()
                 break
             if self.board_full(): # tie game
                 player.reward(0.5, self.board,self.height)
                 other_player.reward(0.5, self.board,self.height)
+                self.display_board()
                 break
             other_player.reward(0, self.board,self.height)
             if self.turn == 'Y':
@@ -48,10 +50,10 @@ class FourInLine:
     def player_wins(self, char, column):
         pos_y = len(self.board[column])-1
         pos_x = column
-        vertical_check = check_vertically(char, pos_x, pos_y)
-        horizontal_check = check_horizontally(char, pos_x, pos_y)
-        identity_check = check_identity_diagonal(char, pos_x, pos_y)
-        not_identity_check = check_not_identity_diagonal(char, pos_x, pos_y)
+        vertical_check = self.check_vertically(char, pos_x, pos_y)
+        horizontal_check = self.check_horizontally(char, pos_x, pos_y)
+        identity_check = self.check_identity_diagonal(char, pos_x, pos_y)
+        not_identity_check = self.check_not_identity_diagonal(char, pos_x, pos_y)
         return vertical_check or horizontal_check or identity_check or not_identity_check
 
     def check_vertically(self, char, pos_x, pos_y):
@@ -64,7 +66,7 @@ class FourInLine:
     def check_horizontally(self, char, pos_x, pos_y):
         result = False
         for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or check_horizontally_aux(self, char, pos_x, pos_y, a, b, c)
+            result = result or self.check_horizontally_aux(char, pos_x, pos_y, a, b, c)
         # result = False
         # if pos_x >= 3:
         #     result = result or check_horizontally_aux(self, char, pos_x, pos_y, -1, -2, -3)
@@ -79,7 +81,7 @@ class FourInLine:
 
     def check_horizontally_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
         try: 
-            if char == self.board[pos_x+offset_1][pos_y] == self.board[pos_x+offset_2][pos_y] == self.board[pos_x+offset_3][pos_y]
+            if char == self.board[pos_x+offset_1][pos_y] == self.board[pos_x+offset_2][pos_y] == self.board[pos_x+offset_3][pos_y]:
                 return True
         except:
             return False
@@ -87,13 +89,13 @@ class FourInLine:
     def check_identity_diagonal(self, char, pos_x, pos_y):
         result = False
         for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or check_identity_diagonal_aux(self, char, pos_x, pos_y, a, b, c)
+            result = result or self.check_identity_diagonal_aux(char, pos_x, pos_y, a, b, c)
         return result
 
 
     def check_identity_diagonal_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
         try: 
-            if char == self.board[pos_x+offset_1][pos_y+offset_1] == self.board[pos_x+offset_2][pos_y+offset_2] == self.board[pos_x+offset_3][pos_y+offset_3]
+            if char == self.board[pos_x+offset_1][pos_y+offset_1] == self.board[pos_x+offset_2][pos_y+offset_2] == self.board[pos_x+offset_3][pos_y+offset_3]:
                 return True
         except:
             return False
@@ -101,13 +103,13 @@ class FourInLine:
     def check_not_identity_diagonal(self, char, pos_x, pos_y):
         result = False
         for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or check_not_identity_diagonal_aux(self, char, pos_x, pos_y, a, b, c)
+            result = result or self.check_not_identity_diagonal_aux(char, pos_x, pos_y, a, b, c)
         return result
 
 
     def check_not_identity_diagonal_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
         try: 
-            if char == self.board[pos_x+offset_1][pos_y-offset_1] == self.board[pos_x+offset_2][pos_y-offset_2] == self.board[pos_x+offset_3][pos_y-offset_3]
+            if char == self.board[pos_x+offset_1][pos_y-offset_1] == self.board[pos_x+offset_2][pos_y-offset_2] == self.board[pos_x+offset_3][pos_y-offset_3]:
                 return True
         except:
             return False
