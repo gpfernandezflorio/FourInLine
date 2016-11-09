@@ -95,12 +95,6 @@ class gridWorld():
 	
 			# 4) Actualizo s
 			state = new_state
-		for x in self.Q:
-			for d in x:
-				t = ""
-				for a in d:
-					t = t + "[" + "]" + a + ": " + str(int(d[a])) + " "
-				print t
 		
 	
 	""" Funcion para plotear la Q"""
@@ -119,13 +113,13 @@ class gridWorld():
 		fig = pylab.figure(figsize=2*np.array([self.width,self.height]))
 		for i in range(matrix_right.shape[0]):
 			for j in range(matrix_right.shape[1]):
-				if not np.isnan(matrix_stay[i][j]): pylab.text(j-.5, self.height- i-.5,'X')
+				if np.isnan(matrix_stay[i][j]): pylab.text(j-.5, self.height- i-.5,'X')
 				else:
-					pylab.text(j+0.2-.5, self.height-  i-.5,str(matrix_right[i][j])[1:4]+">")
-					pylab.text(j-0.3-.5, self.height-i-.5,"<"+str(matrix_left[i][j])[1:4])
+					pylab.text(j+0.2-.5, self.height-  i-.5,str(matrix_right[i][j])[0:4]+">")
+					pylab.text(j-0.3-.5, self.height-i-.5,"<"+str(matrix_left[i][j])[0:4])
 
-					pylab.text(j-.5, self.height- i+.1-.5,str(matrix_up[i][j])[1:4])
-					pylab.text(j-.5, self.height- i-.1-.5,str(matrix_down[i][j])[1:4])
+					pylab.text(j-.5, self.height- i+.1-.5,str(matrix_up[i][j])[0:4])
+					pylab.text(j-.5, self.height- i-.1-.5,str(matrix_down[i][j])[0:4])
 
 		pylab.xlim(-1,self.width-1)
 		pylab.ylim(0,self.height)
@@ -146,10 +140,10 @@ if __name__ == "__main__":
 	
 	
 	# Ejemplo de gridWorld  de 2x3 
-	gw =gridWorld(height=4,width=4,goals=[[2,2]])
+	gw =gridWorld(height=4,width=4,goals=[[0,0]])
 
 	# Entreno 1K veces
-	for epoch in range(10):
+	for epoch in range(1000):
 		# Ploteo la matrix a los 10,200, y 999 epochs
 		if epoch==10: gw.draw()
 		if epoch==200: gw.draw()
