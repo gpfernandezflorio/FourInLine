@@ -52,10 +52,10 @@ class FourInLine:
         for j in range(self.height-1,-1,-1):
             row = "|"
             for i in range(len(self.board)):
-                if len(self.board[i]) <= self.height:
-                    row += " |"
-                else:
+                if j < len(self.board[i]):
                     row += str(self.board[i][j]) + "|"
+                else:
+                    row += " |"
             print (row)
 
 class Player(object):
@@ -67,8 +67,8 @@ class Player(object):
 
     def move(self, board,height):
         x = len(board)
-        while (x >= len(board) or len(board[x]) >= height):
-            x = int(raw_input("Your move? "))
+        while (x < 0 or x >= len(board) or len(board[x]) >= height):
+            x = int(raw_input("Your move? "))-1
         return x
 
     def reward(self, value, board):
