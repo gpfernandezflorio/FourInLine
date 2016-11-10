@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import random
 import pickle
+import sys
+
 
 def display_board(board, height):
     for j in range(height-1,-1,-1):
@@ -66,12 +68,12 @@ class FourInLine:
         pos_x = column
         if(self.check_vertically(char, pos_x, pos_y)):
             return True
-#        if(self.check_horizontally(char, pos_x, pos_y)):
-#            return True
-#        if(self.check_identity_diagonal(char, pos_x, pos_y)):
-#            return True
-#        if(self.check_not_identity_diagonal(char, pos_x, pos_y)):
-#            return True
+        if(self.check_horizontally(char, pos_x, pos_y)):
+            return True
+        if(self.check_identity_diagonal(char, pos_x, pos_y)):
+            return True
+        if(self.check_not_identity_diagonal(char, pos_x, pos_y)):
+            return True
         return False
 
     def check_vertically(self, char, pos_x, pos_y):
@@ -312,36 +314,44 @@ class QQLearningPlayer(QLearningPlayer):
       #TODO!
       return m
 
-#p1 = RandomPlayer()
-p1 = QQLearningPlayer()
-#epsilon, gamma, alpha
-p2 = QQLearningPlayer(0.9,0.3,0.9)
 
-size = (6, 7)
+if __name__ == "__main__":
+    print 'Number of arguments:', len(sys.argv), 'arguments.'
+    print 'Argument List:', str(sys.argv)#p1 = RandomPlayer()
+    key1 = sys.argv[1]
+    key2 = sys.argv[2]
+    iterations = int(sys.argv[3])
+    players = {'q': QLearningPlayer(), 'r': RandomPlayer(), 'qq':QQLearningPlayer()}
+    p1 = players[key1] 
+    #epsilon, gamma, alpha
+    p2 = players[key2]#QQLearningPlayer(0.9,0.3,0.9)
 
-try:
-    i=0
+    size = (6, 7)
+    print "#iter", str(iterations)
+
+    try:
+        i=0
+        while (i< iterations):
+            t = FourInLine(p1, p2, size[0], size[1])
+            t.play_game()
+            if i % 1000 == 0: print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
+            i += 1
+    except KeyboardInterrupt:
+        print "\nGuardando jugador entrenado. Espere por favor..."
+
+    f = open('Q0.dic.'+key2.upper(),'wb')
+    pickle.dump(p2.q,f)
+    f.close()
+
+    print "Listo!"
+
+    #f = open('Q0.dic','rb')
+    #p2.q = pickle.load(f)
+
+    p1 = Player()
+    #p2 = Player()
+    p2.epsilon = 0
+
     while True:
         t = FourInLine(p1, p2, size[0], size[1])
-        t.play_game()
-        if i % 1000 == 0: print "Entrenando ..." + str(i/1000) + ". Presione Ctrl+C para dejar de entrenar."
-        i += 1
-except KeyboardInterrupt:
-    print "\nGuardando jugador entrenado. Espere por favor..."
-
-f = open('Q0.dic','wb')
-pickle.dump(p2.q,f)
-f.close()
-
-print "Listo!"
-
-#f = open('Q0.dic','rb')
-#p2.q = pickle.load(f)
-
-p1 = Player()
-#p2 = Player()
-p2.epsilon = 0
-
-while True:
-    t = FourInLine(p1, p2, size[0], size[1])
-    t.play_game(True)
+        t.play_game(True)
