@@ -31,6 +31,7 @@ class FourInLine:
     def play_game(self, play=False):
         self.red.start_game('1',len(self.board))
         self.blue.start_game('2',len(self.board))
+
         while True: #yolo
             if self.turn == '1':
                 player, char, other_player = self.red, '1', self.blue
@@ -46,14 +47,14 @@ class FourInLine:
                 if play:
                     display_board(self.board, self.height)
                     print "Jugador " + self.turn + " GANA! (" + player.breed + ")"
-                break
+                return self.turn
             if self.board_full(): # tie game
                 player.reward(0.5, self.board, self.height)
                 other_player.reward(0.5, self.board,self.height)
                 if play:
                     display_board(self.board, self.height)
                     print "EMPATE!"
-                break
+                return "0"
             other_player.reward(0, self.board,self.height)
             if self.turn == '1':
                 self.turn = '2'
@@ -336,19 +337,53 @@ if __name__ == "__main__":
     size = (6, 7)
     print "#iter", str(iterations)
 
+    f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','w')
+    f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','w')
+    f1.write("")
+    f2.write("")
+
+    f1.close()
+    f2.close()
+
+
     try:
         i=0
+        res = ["",""]
+        win = [0,0.0,0.0]
+        tot = 0
         while (i != iterations):
             t = FourInLine(p1, p2, size[0], size[1])
-            t.play_game()
-            if i % 1000 == 0: print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
+            winner = t.play_game(False)
+            if winner==0:
+                self.tot += 1
+                res[0] += str(self.tot) + "\t" + str(self.win[1] / self.tot) + "\n"
+                res[1] += str(self.tot) + "\t" + str(self.win[2] / self.tot) + "\n"
+            else:
+                tot += 1
+                win[int(winner)] += 1
+                res[0] += str(win[1] / tot) + "\n"
+                res[1] += str(win[2] / tot) + "\n"
+            if i % 1000 == 0:
+                print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
+                f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
+                f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
+                f1.write(res[0])
+                f2.write(res[1])
+                f1.close()
+                f2.close()
+                res = ["",""]
             i += 1
     except KeyboardInterrupt:
         print "\nGuardando jugador entrenado. Espere por favor..."
 
-    f = open('Q0.dic.'+key2.upper(),'wb')
-    pickle.dump(p2.q,f)
-    f.close()
+    if key1 == "q" or key1 == "qq":
+        f = open("1-"+key1.upper()+".dic",'wb')
+        pickle.dump(p1.q,f)
+        f.close()
+    if key2 == "q" or key2 == "qq":
+        f = open("2-"+key2.upper()+".dic",'wb')
+        pickle.dump(p2.q,f)
+        f.close()
 
     print "Listo!"
 
