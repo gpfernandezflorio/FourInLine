@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import random
-
-def make_matrix(board, height):
-  m = ""
-  for i in board:
-    for j in i:
-      m += str(j)
-    m+=";"
-  return m
+import pickle
 
 def display_board(board, height):
     for j in range(height-1,-1,-1):
@@ -73,12 +66,12 @@ class FourInLine:
         pos_x = column
         if(self.check_vertically(char, pos_x, pos_y)):
             return True
-        if(self.check_horizontally(char, pos_x, pos_y)):
-            return True
-        if(self.check_identity_diagonal(char, pos_x, pos_y)):
-            return True
-        if(self.check_not_identity_diagonal(char, pos_x, pos_y)):
-            return True
+#        if(self.check_horizontally(char, pos_x, pos_y)):
+#            return True
+#        if(self.check_identity_diagonal(char, pos_x, pos_y)):
+#            return True
+#        if(self.check_not_identity_diagonal(char, pos_x, pos_y)):
+#            return True
         return False
 
     def check_vertically(self, char, pos_x, pos_y):
@@ -199,12 +192,15 @@ class QLearningPlayer(Player):
         self.epsilon = epsilon # e-greedy chance of random exploration
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor for future rewards
+        self.me = "?"
 
     def start_game(self, char, width):
         self.last_board = []
         for i in range(width):
             self.last_board.append([])
         self.last_move = None
+        self.mm = ""
+        self.me = char
 
     def getQ(self, state, action):
         # encourage exploration; "optimistic" 1.0 initial values
@@ -214,13 +210,14 @@ class QLearningPlayer(Player):
 
     def move(self, board, height):
         self.last_board = board
+        self.mm = self.make_matrix(board, height)
         actions = self.available_moves(board, height)
 
         if random.random() < self.epsilon: # explore!
             self.last_move = random.choice(actions)
-            return self.last_move
+            return self.decide()
 
-        qs = [self.getQ(make_matrix(board, height), a) for a in actions]
+        qs = [self.getQ(self.mm, a) for a in actions]
         maxQ = max(qs)
 
         if qs.count(maxQ) > 1:
@@ -231,31 +228,115 @@ class QLearningPlayer(Player):
             i = qs.index(maxQ)
 
         self.last_move = actions[i]
-        return actions[i]
+        return self.decide()
+
+    def decide(self):
+        return self.last_move
 
     def reward(self, value, board, height):
         if self.last_move:
             self.learn(self.last_board, self.last_move, value, board, height)
 
     def learn(self, state, action, reward, result_state, height):
-        prev = self.getQ(make_matrix(state, height), action)
+        prev = self.getQ(self.mm, action)
         if len(self.available_moves(result_state, height)) == 0:
             maxqnew = 0
         else:
-            maxqnew = max([self.getQ(make_matrix(result_state, height), a) for a in self.available_moves(result_state, height)])
-        self.q[(make_matrix(state, height), action)] = prev + self.alpha * ((reward + self.gamma*maxqnew) - prev)
+            result_mm = self.make_matrix(result_state, height)
+            maxqnew = max([self.getQ(result_mm, a) for a in self.available_moves(result_state, height)])
+        self.q[(self.mm, action)] = prev + self.alpha * ((reward + self.gamma*maxqnew) - prev)
 
-p1 = RandomPlayer()
-p1 = QLearningPlayer()
+    def make_matrix(self, board, height):
+      m = ""
+      for i in board:
+        for j in i:
+          m += str(j)
+        m+=";"
+      return m[0:-1]
+
+class QQLearningPlayer(QLearningPlayer):
+    def start_game(self, char, width):
+        self.last_board = []
+        for i in range(width):
+            self.last_board.append([])
+        self.last_move = None
+        self.mm = ""
+        self.me = char
+        self.myLines = []
+        self.enLines = []
+
+    def decide(self):
+      try:
+        x = int(self.last_move)
+        return x
+      except ValueError:
+        if self.last_move[0] == "M":
+          return self.myLines[int(self.last_move[1:])][1]
+        else:
+          return self.enLines[int(self.last_move[1:])][1]
+
+    def available_moves(self, board, height):
+        if (len(self.myLines)==0):
+          return [i for i in range(len(board))]
+        result = []
+        for i in range(len(self.myLines)):
+          if self.myLines[i][1] + self.myLines[i][0] < height:
+            result.append("M"+str(i))
+        for i in range(len(self.enLines)):
+          if self.enLines[i][1] + self.enLines[i][0] < height:
+            result.append("E"+str(i))
+        return result
+
+    def make_matrix(self, board, height):
+      myLines = []
+      enLines = []
+      for j in range(len(board)):
+        column = board[j]
+        if (len(column) > 0):
+          start = column[0]
+          line = [1,j,0]
+          for i in range(1,len(column)):
+            if column[i]==start:
+              line[0] += 1
+            else:
+              line = [1,j,i]
+              start = column[i]
+          if start==self.me:
+            myLines.append(line)
+          else:
+            enLines.append(line)
+      if board==self.last_board:
+        self.myLines = myLines
+        self.enLines = enLines
+      m = ""
+      #TODO!
+      return m
+
+#p1 = RandomPlayer()
+p1 = QQLearningPlayer()
 #epsilon, gamma, alpha
-p2 = QLearningPlayer(0.9,0.3,0.9)
+p2 = QQLearningPlayer(0.9,0.3,0.9)
 
 size = (6, 7)
 
-for i in xrange(0,30000):
-    t = FourInLine(p1, p2, size[0], size[1])
-    t.play_game()
-    if i % 1000 == 0: print i
+try:
+    i=0
+    while True:
+        t = FourInLine(p1, p2, size[0], size[1])
+        t.play_game()
+        if i % 1000 == 0: print "Entrenando ..." + str(i/1000) + ". Presione Ctrl+C para dejar de entrenar."
+        i += 1
+except KeyboardInterrupt:
+    print "\nGuardando jugador entrenado. Espere por favor..."
+
+f = open('Q0.dic','wb')
+pickle.dump(p2.q,f)
+f.close()
+
+print "Listo!"
+
+#f = open('Q0.dic','rb')
+#p2.q = pickle.load(f)
 
 p1 = Player()
 #p2 = Player()
