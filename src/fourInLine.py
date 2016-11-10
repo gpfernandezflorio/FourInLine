@@ -317,21 +317,28 @@ class QQLearningPlayer(QLearningPlayer):
 
 if __name__ == "__main__":
     print 'Number of arguments:', len(sys.argv), 'arguments.'
+    if len(sys.argv) < 3:
+        print "Error: expected at least 2 arguments"
+        exit()
     print 'Argument List:', str(sys.argv)#p1 = RandomPlayer()
     key1 = sys.argv[1]
     key2 = sys.argv[2]
-    iterations = int(sys.argv[3])
-    players = {'q': QLearningPlayer(), 'r': RandomPlayer(), 'qq':QQLearningPlayer()}
-    p1 = players[key1] 
+    if len(sys.argv) < 4:
+        iterations = -1
+    else:
+        iterations = int(sys.argv[3])
+    players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 'qq':QQLearningPlayer()}
+    players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 'qq':QQLearningPlayer()}
+    p1 = players1[key1] 
     #epsilon, gamma, alpha
-    p2 = players[key2]#QQLearningPlayer(0.9,0.3,0.9)
+    p2 = players2[key2]#QQLearningPlayer(0.9,0.3,0.9)
 
     size = (6, 7)
     print "#iter", str(iterations)
 
     try:
         i=0
-        while (i< iterations):
+        while (i != iterations):
             t = FourInLine(p1, p2, size[0], size[1])
             t.play_game()
             if i % 1000 == 0: print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
