@@ -3,7 +3,7 @@
 import random
 import pickle
 import sys
-
+import signal
 
 def display_board(board, height):
     for j in range(height-1,-1,-1):
@@ -315,6 +315,25 @@ class QQLearningPlayer(QLearningPlayer):
       #TODO!
       return m
 
+p1 = None
+p2 = None
+key1 = '-'
+key2 = '-'
+
+def signal_handler(signal, frame):
+    if key1 == "q" or key1 == "qq":
+        f = open("1-"+key1.upper()+".dic",'wb')
+        pickle.dump(p1.q,f)
+        f.close()
+    if key2 == "q" or key2 == "qq":
+        f = open("2-"+key2.upper()+".dic",'wb')
+        pickle.dump(p2.q,f)
+        f.close()
+
+    print "Listo!"
+    f = open('done.txt','w')
+    f.write('done\n')
+    f.close()
 
 if __name__ == "__main__":
     print 'Number of arguments:', len(sys.argv), 'arguments.'
@@ -339,61 +358,37 @@ if __name__ == "__main__":
 
     f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','w')
     f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','w')
-    f1.write("")
-    f2.write("")
+    f1.write("0\n")
+    f2.write("0\n")
 
     f1.close()
     f2.close()
 
-
-    try:
-        i=0
-        res = ["",""]
-        win = [0,0.0,0.0]
-        tot = 0
-        while (i != iterations):
-            t = FourInLine(p1, p2, size[0], size[1])
-            winner = t.play_game(False)
-            if winner==0:
-                self.tot += 1
-                res[0] += str(self.tot) + "\t" + str(self.win[1] / self.tot) + "\n"
-                res[1] += str(self.tot) + "\t" + str(self.win[2] / self.tot) + "\n"
-            else:
-                tot += 1
-                win[int(winner)] += 1
-                res[0] += str(win[1] / tot) + "\n"
-                res[1] += str(win[2] / tot) + "\n"
-            if i % 1000 == 0:
-                print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
-                f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
-                f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
-                f1.write(res[0])
-                f2.write(res[1])
-                f1.close()
-                f2.close()
-                res = ["",""]
-            i += 1
-    except KeyboardInterrupt:
-        print "\nGuardando jugador entrenado. Espere por favor..."
-
-    if key1 == "q" or key1 == "qq":
-        f = open("1-"+key1.upper()+".dic",'wb')
-        pickle.dump(p1.q,f)
-        f.close()
-    if key2 == "q" or key2 == "qq":
-        f = open("2-"+key2.upper()+".dic",'wb')
-        pickle.dump(p2.q,f)
-        f.close()
-
-    print "Listo!"
-
-    #f = open('Q0.dic','rb')
-    #p2.q = pickle.load(f)
-
-    p1 = Player()
-    #p2 = Player()
-    p2.epsilon = 0
-
-    while True:
+    i=0
+    res = ["",""]
+    win = [0,0.0,0.0]
+    tot = 0
+    signal.signal(signal.SIGINT, signal_handler)
+    while (i != iterations):
         t = FourInLine(p1, p2, size[0], size[1])
-        t.play_game(True)
+        winner = t.play_game(False)
+        if winner==0:
+            self.tot += 1
+            res[0] += str(self.tot) + "\t" + str(self.win[1] / self.tot) + "\n"
+            res[1] += str(self.tot) + "\t" + str(self.win[2] / self.tot) + "\n"
+        else:
+            tot += 1
+            win[int(winner)] += 1
+            res[0] += str(win[1] / tot) + "\n"
+            res[1] += str(win[2] / tot) + "\n"
+        if i % 1000 == 0:
+            print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
+            if i % 50000 == 0:
+              f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
+              f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
+              f1.write(res[0])
+              f2.write(res[1])
+              f1.close()
+              f2.close()
+              res = ["",""]
+        i += 1
