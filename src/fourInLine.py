@@ -368,21 +368,26 @@ if __name__ == "__main__":
     res = ["",""]
     win = [0,0.0,0.0]
     tot = 0
+    c1 = 1
+    c2 = 100
+    k = 0
     signal.signal(signal.SIGINT, signal_handler)
     while (i != iterations):
+        k+=1
         t = FourInLine(p1, p2, size[0], size[1])
         winner = t.play_game(False)
-        if winner==0:
-            self.tot += 1
-            res[0] += str(self.tot) + "\t" + str(self.win[1] / self.tot) + "\n"
-            res[1] += str(self.tot) + "\t" + str(self.win[2] / self.tot) + "\n"
-        else:
-            tot += 1
+    	tot += 1
+        if winner!=0:
             win[int(winner)] += 1
-            res[0] += str(win[1] / tot) + "\n"
-            res[1] += str(win[2] / tot) + "\n"
+        if k==c1:
+            res[0] += str(tot) + "\t" + str(win[1] / tot) + "\n"
+            res[1] += str(tot) + "\t" + str(win[2] / tot) + "\n"
+            k = 0
+        if i >= c2:
+            c2*=10
+            c1*=10
         if i % 1000 == 0:
-            print "Entrenando ..." + str(i) + ". Presione Ctrl+C para dejar de entrenar."
+            print "Entrenando ..." + str(i)
             if i % 50000 == 0:
               f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
               f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
