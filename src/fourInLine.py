@@ -321,6 +321,7 @@ key1 = '-'
 key2 = '-'
 
 def signal_handler(signal, frame):
+    print "Guardando los modelos entrenados. Espere por favor..."
     if key1 == "q" or key1 == "qq":
         f = open("1-"+key1.upper()+".dic",'wb')
         pickle.dump(p1.q,f)
@@ -358,8 +359,8 @@ if __name__ == "__main__":
 
     f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','w')
     f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','w')
-    f1.write("0\n")
-    f2.write("0\n")
+    f1.write("0\t0\n")
+    f2.write("0\t0\n")
 
     f1.close()
     f2.close()
