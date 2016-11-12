@@ -321,6 +321,7 @@ p2 = None
 key1 = '-'
 key2 = '-'
 
+<<<<<<< HEAD
 
 def save_players(key,player,whichplayer):
     if key == "q" or key == "s":
@@ -347,7 +348,7 @@ def signal_handler(signal, frame):
     save_players(key2,p2,"2")
     print "Listo!"
     f = open('done.txt','w')
-    f.write('done\n')
+    f.write('done '+str(x)+'\n')
     f.close()
 
 
@@ -435,6 +436,7 @@ if __name__ == "__main__":
     elif train_or_play == 'play':
         print "A jugar"
         t = FourInLine(p1, p2, size[0], size[1])
+
         try:
             while True:
                 t = FourInLine(p1, p2, size[0], size[1])
