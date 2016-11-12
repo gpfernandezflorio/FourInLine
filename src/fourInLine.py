@@ -321,9 +321,8 @@ p2 = None
 key1 = '-'
 key2 = '-'
 
-<<<<<<< HEAD
-
 def save_players(key,player,whichplayer):
+    print "Guardando el modelos de " + whichplayer + " entrenado. Espere por favor..."
     if key == "q" or key == "s":
         f = open(key.upper()+whichplayer+".dic",'wb')
         pickle.dump(player.q,f)
@@ -343,12 +342,11 @@ def load_player(key,players):
     return player
 
 def signal_handler(signal, frame):
-    print "Guardando los modelos entrenados. Espere por favor..."
     save_players(key1,p1,"1")
     save_players(key2,p2,"2")
     print "Listo!"
     f = open('done.txt','w')
-    f.write('done '+str(x)+'\n')
+    f.write('done\n')
     f.close()
 
 
@@ -370,12 +368,8 @@ if __name__ == "__main__":
         iterations = int(sys.argv[3])
     players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
     players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
-    #p1 = players1[key1] 
-    #epsilon, gamma, alpha
-    #p2 = players2[key2]#SmartQLearningPlayer(0.9,0.3,0.9)
 
     p1 = load_player(key1,players1)
-    print "Ya cargo el player"
     p2 = load_player(key2,players2)
 
     size = (6, 7)
@@ -413,7 +407,7 @@ if __name__ == "__main__":
             if i >= c2:
                 c2*=10
                 c1*=10
-            if i % 10000 == 0:
+            if i % 1000 == 0:
                 print "Entrenando ..." + str(i)
                 if i % 50000 == 0:
                   f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
@@ -440,7 +434,7 @@ if __name__ == "__main__":
         try:
             while True:
                 t = FourInLine(p1, p2, size[0], size[1])
-                t.play_game()
+                t.play_game(True)
         except KeyboardInterrupt:
             print "\nChau!..."
     else:
