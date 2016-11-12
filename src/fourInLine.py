@@ -320,21 +320,27 @@ p2 = None
 key1 = '-'
 key2 = '-'
 
-def signal_handler(signal, frame):
+to_save = False
+
+def save(x):
     print "Guardando los modelos entrenados. Espere por favor..."
     if key1 == "q" or key1 == "qq":
-        f = open("1-"+key1.upper()+".dic",'wb')
+        f = open("1-"+key1.upper()+"vs"+key2.upper()+"-"+str(x)+".dic",'wb')
         pickle.dump(p1.q,f)
         f.close()
     if key2 == "q" or key2 == "qq":
-        f = open("2-"+key2.upper()+".dic",'wb')
+        f = open("2-"+key2.upper()+"vs"+key1.upper()+"-"+str(x)+".dic",'wb')
         pickle.dump(p2.q,f)
         f.close()
 
     print "Listo!"
     f = open('done.txt','w')
-    f.write('done\n')
+    f.write('done '+str(x)+'\n')
     f.close()
+    to_save = False
+
+def signal_handler(signal, frame):
+    to_save = True
 
 if __name__ == "__main__":
     print 'Number of arguments:', len(sys.argv), 'arguments.'
@@ -377,7 +383,7 @@ if __name__ == "__main__":
         k+=1
         t = FourInLine(p1, p2, size[0], size[1])
         winner = t.play_game(False)
-    	tot += 1
+        tot += 1
         if winner!=0:
             win[int(winner)] += 1
         if k==c1:
@@ -398,3 +404,12 @@ if __name__ == "__main__":
               f2.close()
               res = ["",""]
         i += 1
+        if (to_save):
+            save(i)
+    f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
+    f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
+    f1.write(res[0])
+    f2.write(res[1])
+    f1.close()
+    f2.close()
+    save(i)
