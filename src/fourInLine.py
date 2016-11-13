@@ -259,6 +259,14 @@ class QLearningPlayer(Player):
       return m[0:-1]
 
 class SmartQLearningPlayer(QLearningPlayer):
+    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
+        self.breed = "SQlearner"
+        self.q = {} # (state, action) keys: Q values
+        self.epsilon = epsilon # e-greedy chance of random exploration
+        self.alpha = alpha # learning rate
+        self.gamma = gamma # discount factor for future rewards
+        self.me = "?"
+
     def start_game(self, char, width):
         self.last_board = []
         for i in range(width):
@@ -321,10 +329,17 @@ p2 = None
 key1 = '-'
 key2 = '-'
 
-def save_players(key,player,whichplayer):
-    print "Guardando el modelos de " + whichplayer + " entrenado. Espere por favor..."
+to_save = False
+
+def save_player(key,player,whichplayer,other):
     if key == "q" or key == "s":
-        f = open(key.upper()+whichplayer+".dic",'wb')
+        print "Guardando el modelo entrenado de " + whichplayer + ". Espere por favor..."
+        f = open(key.upper()+whichplayer+"vs"+other+".dic",'wb')
+        pickle.dump(player.q,f)
+        f.close()
+    elif os.path.isfile(key):
+        print "Guardando el modelo entrenado de " + whichplayer + ". Espere por favor..."
+        f = open(key,'wb')
         pickle.dump(player.q,f)
         f.close()
 
@@ -332,7 +347,8 @@ def load_player(key,players):
     if key in ('q','r','s','h'):
         player = players[key]
     elif os.path.isfile(key):
-        player = players1[key[0].lower()]
+        print "Cargando el modelo entrenado de " + key + ". Espere por favor..."
+        player = players[key[0].lower()]
         f = open(key,'rb')
         player.q = pickle.load(f)
         f.close()
@@ -341,51 +357,57 @@ def load_player(key,players):
         exit()
     return player
 
-def signal_handler(signal, frame):
-    save_players(key1,p1,"1")
-    save_players(key2,p2,"2")
+def save_players(x):
+    save_player(key1,p1,"1",p2.breed)
+    save_player(key2,p2,"2",p1.breed)
     print "Listo!"
     f = open('done.txt','w')
-    f.write('done\n')
+    f.write('done '+str(x)+'\n')
     f.close()
 
+def save_train_data(res,m):
+    f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat',m)
+    f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat',m)
+    f1.write(res[0])
+    f2.write(res[1])
+    f1.close()
+    f2.close()
+
+def signal_handler(signal, frame):
+    global to_save
+    print "SIGNAL RECIEVED!"
+    to_save = True
 
 if __name__ == "__main__":
     print 'Number of arguments:', len(sys.argv), 'arguments.'
     if len(sys.argv) < 3:
         print "Error: expected at least 2 arguments"
         exit()
-    print 'Argument List:', str(sys.argv)#p1 = RandomPlayer()
+    print 'Argument List:', str(sys.argv)
     key1 = sys.argv[1]
     key2 = sys.argv[2]
-    if len(sys.argv) < 5:
-        train_or_play =  "train"
-    else:
-        train_or_play = sys.argv[4]
     if len(sys.argv) < 4:
         iterations = -1
     else:
         iterations = int(sys.argv[3])
+
     players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
     players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
 
     p1 = load_player(key1,players1)
     p2 = load_player(key2,players2)
 
+    if p1.breed == "human" or p2.breed == "human":
+        train_or_play =  "play"
+    else:
+        train_or_play =  "train"
+        print "#iter", str(iterations)
+
     size = (6, 7)
-    print "#iter", str(iterations)
 
 
-    f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','w')
-    f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','w')
-    f1.write("0\t0\n")
-    f2.write("0\t0\n")
-    f1.close()
-    f2.close()
-
-    
-    if(train_or_play == 'train'):
-        i=0
+    if train_or_play == 'train':
+        save_train_data(["0\t0\n","0\t0\n"],'w')
         res = ["",""]
         win = [0,0.0,0.0]
         tot = 0
@@ -393,7 +415,10 @@ if __name__ == "__main__":
         c2 = 100
         k = 0
         signal.signal(signal.SIGINT, signal_handler)
-        while (i != iterations):
+        while (tot != iterations):
+            if to_save:
+              save_players(tot)
+              to_save = False
             k+=1
             t = FourInLine(p1, p2, size[0], size[1])
             winner = t.play_game(False)
@@ -404,32 +429,20 @@ if __name__ == "__main__":
                 res[0] += str(tot) + "\t" + str(win[1] / tot) + "\n"
                 res[1] += str(tot) + "\t" + str(win[2] / tot) + "\n"
                 k = 0
-            if i >= c2:
+            if tot >= c2:
                 c2*=10
                 c1*=10
-            if i % 1000 == 0:
-                print "Entrenando ..." + str(i)
-                if i % 50000 == 0:
-                  f1 = open('A-1('+p1.breed + ')vs2-(' + p2.breed + ').dat','a')
-                  f2 = open('A-2('+p2.breed + ')vs1-(' + p1.breed + ').dat','a')
-                  f1.write(res[0])
-                  f2.write(res[1])
-                  f1.close()
-                  f2.close()
+            if tot % 1000 == 0:
+                print "Entrenando ..." + str(tot)
+                if tot % 50000 == 0:
+                  save_train_data(res,'a')
                   res = ["",""]
-            i += 1
 
-        save_players(key1,p1,"1")
-        save_players(key2,p2,"2")
+        save_train_data(res,'a')
+        save_players(tot)
 
-        print "Listo!"
-        f = open('done.txt','w')
-        f.write('done\n')
-        f.close()
-
-    elif train_or_play == 'play':
+    else:
         print "A jugar"
-        t = FourInLine(p1, p2, size[0], size[1])
 
         try:
             while True:
@@ -437,5 +450,3 @@ if __name__ == "__main__":
                 t.play_game(True)
         except KeyboardInterrupt:
             print "\nChau!..."
-    else:
-        print"Falta el parámetro de Train o Play"
