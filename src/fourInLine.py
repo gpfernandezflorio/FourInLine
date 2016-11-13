@@ -153,6 +153,8 @@ class Player(object):
 
     def start_game(self, char, width):
         pass
+    def play_mode(self):
+        pass
 
     def move(self, board, height):
         x = len(board)
@@ -197,6 +199,8 @@ class QLearningPlayer(Player):
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor for future rewards
         self.me = "?"
+    def play_mode(self):
+        self.epsilon = 0.0
 
     def start_game(self, char, width):
         self.last_board = []
@@ -443,7 +447,8 @@ if __name__ == "__main__":
 
     else:
         print "A jugar"
-
+        p1.play_mode()
+        p2.play_mode()
         try:
             while True:
                 t = FourInLine(p1, p2, size[0], size[1])
