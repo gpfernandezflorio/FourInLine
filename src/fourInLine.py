@@ -28,6 +28,7 @@ class FourInLine:
             self.board.append([])
         self.red, self.blue = player1, player2
         self.turn = random.choice(['1', '2'])
+        #self.turn = '1'
 
     def play_game(self, play=False):
         self.red.start_game('1',len(self.board))
@@ -153,7 +154,11 @@ class Player(object):
 
     def start_game(self, char, width):
         pass
-    def play_mode(self):
+    def set_epsilon(self, e):
+        pass
+    def set_gamma(self, g):
+        pass
+    def set_alpha(self, a):
         pass
 
     def move(self, board, height):
@@ -199,8 +204,12 @@ class QLearningPlayer(Player):
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor for future rewards
         self.me = "?"
-    def play_mode(self):
-        self.epsilon = 0.0
+    def set_epsilon(self, e):
+        self.epsilon = e
+    def set_gamma(self, g):
+        self.gamma = g
+    def set_alpha(self, a):
+        self.alpha = a
 
     def start_game(self, char, width):
         self.last_board = []
@@ -287,13 +296,17 @@ class SmartQLearningPlayer(QLearningPlayer):
         return x
       except ValueError:
         if self.last_move[0] == "M":
-          return self.myLines[int(self.last_move[1:])][1]
+          line = self.myLines[int(self.last_move[1:])]
         else:
-          return self.enLines[int(self.last_move[1:])][1]
+          line = self.enLines[int(self.last_move[1:])]
+        if line[3] == 'v':
+          return line[1]
+        elif line[3] == 'h':
+          return line[1]+line[0]
+        elif line[3] == 'H':
+          return line[1]-1
 
     def available_moves(self, board, height):
-        if (len(self.myLines)==0):
-          return [i for i in range(len(board))]
         result = []
         for i in range(len(self.myLines)):
           if self.myLines[i][1] + self.myLines[i][0] < height:
@@ -301,31 +314,67 @@ class SmartQLearningPlayer(QLearningPlayer):
         for i in range(len(self.enLines)):
           if self.enLines[i][1] + self.enLines[i][0] < height:
             result.append("E"+str(i))
+        if len(result)==0:
+          return [i for i in range(len(board))]
         return result
 
+    #LINE : [longitud, columna, fila, orientación]
     def make_matrix(self, board, height):
+      start = '-'
+      line = None
       myLines = []
       enLines = []
+      #Verticales
       for j in range(len(board)):
         column = board[j]
         if (len(column) > 0):
           start = column[0]
-          line = [1,j,0]
+          line = [1,j,0,'v']
           for i in range(1,len(column)):
             if column[i]==start:
               line[0] += 1
             else:
-              line = [1,j,i]
+              line = [1,j,i,'v']
               start = column[i]
           if start==self.me:
             myLines.append(line)
           else:
             enLines.append(line)
+      #Horizontales
+      for i in range(height):
+        k = 0
+        for k in range(len(board)):
+          if len(board[k]) > i:
+            start = board[k][i]
+            line = [1,k,i,'h']
+            break
+        if k != len(board):
+            for j in range(k+1,len(board)):
+                if len(board[j]) <= i:
+                  if len(board[j])==i-1 and line != None:
+                      if start == self.me:
+                        myLines.append(line)
+                      else:
+                        enLines.append(line)
+                  line = None
+                else:
+                    if line == None:
+                        start = board[j][i]
+                        line = [1,j,i,'h']
+                    elif board[j][i]==start:
+                        line[0] += 1
+                    else:
+                      start = board[j][i]
+                      line = [1,j,i,'h']
       if board==self.last_board:
         self.myLines = myLines
         self.enLines = enLines
       m = ""
-      #TODO!
+      for line in myLines:
+        m+=line[3] + str(line[0]) + str(line[1]) + str(line[2])
+      m+=";"
+      for line in enLines:
+        m+=line[3] + str(line[0]) + str(line[1]) + str(line[2])
       return m
 
 p1 = None
@@ -407,8 +456,9 @@ if __name__ == "__main__":
         train_or_play =  "train"
         print "#iter", str(iterations)
 
-    size = (6, 7)
-
+    var_epsilon = False
+#    size = (4, 4)
+    size = (7, 6)
 
     if train_or_play == 'train':
         save_train_data(["0\t0\n","0\t0\n"],'w')
@@ -418,20 +468,27 @@ if __name__ == "__main__":
         c1 = 1
         c2 = 100
         k = 0
+        p1.set_epsilon(0.2)
+        p2.set_epsilon(0.2)
         signal.signal(signal.SIGINT, signal_handler)
         while (tot != iterations):
             if to_save:
               save_players(tot)
               to_save = False
             k+=1
-            if tot< 10000:
-                p1.epsilon = 1
-            elif tot< 50000:
-                p1.epsilon = 0.5
-            elif tot < 200000:
-                epsilon = 0.3
-            elif tot < 400000:
-                epsilon = 0.2
+            if var_epsilon:
+                if tot == 50000:
+                    p1.set_epsilon(0.5)
+                    p2.set_epsilon(0.5)
+                elif tot == 200000:
+                    p1.set_epsilon(0.3)
+                    p2.set_epsilon(0.3)
+                elif tot == 400000:
+                    p1.set_epsilon(0.2)
+                    p2.set_epsilon(0.2)
+                elif tot == 1000000:
+                    p1.set_epsilon(0.1)
+                    p2.set_epsilon(0.1)
             t = FourInLine(p1, p2, size[0], size[1])
             winner = t.play_game(False)
             tot += 1
@@ -455,8 +512,8 @@ if __name__ == "__main__":
 
     else:
         print "A jugar"
-        p1.play_mode()
-        p2.play_mode()
+        p1.set_epsilon(0.0)
+        p2.set_epsilon(0.0)
         try:
             while True:
                 t = FourInLine(p1, p2, size[0], size[1])
