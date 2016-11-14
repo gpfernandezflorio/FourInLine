@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import random
-import pickle
+import cPickle as pickle
 import sys
 import signal
 import os.path
@@ -192,7 +192,7 @@ class RandomPlayer(Player):
         return random.choice(self.available_moves(board,height))
 
 class QLearningPlayer(Player):
-    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
+    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9): #epsilon=0.2, alpha=0.3, gamma=0.9
         self.breed = "Qlearner"
         self.q = {} # (state, action) keys: Q values
         self.epsilon = epsilon # e-greedy chance of random exploration
@@ -263,7 +263,7 @@ class QLearningPlayer(Player):
       return m[0:-1]
 
 class SmartQLearningPlayer(QLearningPlayer):
-    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
+    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9): 
         self.breed = "SQlearner"
         self.q = {} # (state, action) keys: Q values
         self.epsilon = epsilon # e-greedy chance of random exploration
@@ -339,12 +339,12 @@ def save_player(key,player,whichplayer,other):
     if key == "q" or key == "s":
         print "Guardando el modelo entrenado de " + whichplayer + ". Espere por favor..."
         f = open(key.upper()+whichplayer+"vs"+other+".dic",'wb')
-        pickle.dump(player.q,f)
+        pickle.dump(player.q,f,2)
         f.close()
     elif os.path.isfile(key):
         print "Guardando el modelo entrenado de " + whichplayer + ". Espere por favor..."
         f = open(key,'wb')
-        pickle.dump(player.q,f)
+        pickle.dump(player.q,f,2)
         f.close()
 
 def load_player(key,players):
@@ -424,6 +424,14 @@ if __name__ == "__main__":
               save_players(tot)
               to_save = False
             k+=1
+            if tot< 10000:
+                p1.epsilon = 1
+            elif tot< 50000:
+                p1.epsilon = 0.5
+            elif tot < 200000:
+                epsilon = 0.3
+            elif tot < 400000:
+                epsilon = 0.2
             t = FourInLine(p1, p2, size[0], size[1])
             winner = t.play_game(False)
             tot += 1
