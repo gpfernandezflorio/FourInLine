@@ -20,6 +20,85 @@ def display_board(board, height):
         row += str(i+1) + " "
     print row
 
+def board_full(board, height):
+    return not any([len(column) < height for column in board])
+
+def board_empty(board):
+    return all([len(column) == 0 for column in board])
+
+def player_wins(char, column, board):
+    pos_y = len(board[column])-1
+    pos_x = column
+    if(check_vertically(char, pos_x, pos_y, board)):
+        return True
+    if(check_horizontally(char, pos_x, pos_y, board)):
+        return True
+    if(check_identity_diagonal(char, pos_x, pos_y, board)):
+        return True
+    if(check_not_identity_diagonal(char, pos_x, pos_y, board)):
+        return True
+    return False
+
+def check_vertically(char, pos_x, pos_y, board):
+    if len(board[pos_x]) < 4:
+        return False
+    column = board[pos_x]
+    if char == column[pos_y-1] == column[pos_y-2] == column[pos_y-3]:
+        return True
+    return False
+
+def check_horizontally(char, pos_x, pos_y, board):
+    result = False
+    for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
+        result = result or check_horizontally_aux(char, pos_x, pos_y, a, b, c, board)
+    return result
+
+def check_horizontally_aux(char, pos_x, pos_y, offset_1, offset_2, offset_3, board):
+    if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
+        return False
+    try:
+        if char == board[pos_x+offset_1][pos_y] == board[pos_x+offset_2][pos_y] == board[pos_x+offset_3][pos_y]:
+            return True
+        return False
+    except:
+        return False
+
+def check_identity_diagonal(char, pos_x, pos_y, board):
+    result = False
+    for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
+        result = result or check_identity_diagonal_aux(char, pos_x, pos_y, a, b, c, board)
+    return result
+
+def check_identity_diagonal_aux(char, pos_x, pos_y, offset_1, offset_2, offset_3, board):
+    if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
+        return False
+    if (pos_y+offset_1 < 0 or pos_y+offset_2 < 0 or pos_y+offset_3 < 0):
+        return False
+    try:
+        if char == board[pos_x+offset_1][pos_y+offset_1] == board[pos_x+offset_2][pos_y+offset_2] == board[pos_x+offset_3][pos_y+offset_3]:
+            return True
+        return False
+    except:
+        return False
+
+def check_not_identity_diagonal(char, pos_x, pos_y, board):
+    result = False
+    for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
+        result = result or check_not_identity_diagonal_aux(char, pos_x, pos_y, a, b, c, board)
+    return result
+
+def check_not_identity_diagonal_aux(char, pos_x, pos_y, offset_1, offset_2, offset_3, board):
+    if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
+        return False
+    if (pos_y-offset_1 < 0 or pos_y-offset_2 < 0 or pos_y-offset_3 < 0):
+        return False
+    try:
+        if char == board[pos_x+offset_1][pos_y-offset_1] == board[pos_x+offset_2][pos_y-offset_2] == board[pos_x+offset_3][pos_y-offset_3]:
+            return True
+        return False
+    except:
+        return False
+
 class FourInLine:
     def __init__(self, player1, player2, width, height):
         self.height = height
@@ -43,14 +122,14 @@ class FourInLine:
                 display_board(self.board, self.height)
             column = player.move(self.board,self.height)
             self.board[column].append(char)
-            if self.player_wins(char,column):
+            if player_wins(char,column, self.board):
                 player.reward(1, self.board, self.height)
                 other_player.reward(-1, self.board,self.height)
                 if play:
                     display_board(self.board, self.height)
                     print "Jugador " + self.turn + " GANA! (" + player.breed + ")"
                 return self.turn
-            if self.board_full(): # tie game
+            if board_full(self.board, self.height): # tie game
                 player.reward(0.5, self.board, self.height)
                 other_player.reward(0.5, self.board,self.height)
                 if play:
@@ -62,91 +141,6 @@ class FourInLine:
                 self.turn = '2'
             else:
                 self.turn = '1'
-
-    def board_full(self):
-        return not any([len(column) < self.height for column in self.board])
-
-    def player_wins(self, char, column):
-        pos_y = len(self.board[column])-1
-        pos_x = column
-        if(self.check_vertically(char, pos_x, pos_y)):
-            return True
-        if(self.check_horizontally(char, pos_x, pos_y)):
-            return True
-        if(self.check_identity_diagonal(char, pos_x, pos_y)):
-            return True
-        if(self.check_not_identity_diagonal(char, pos_x, pos_y)):
-            return True
-        return False
-
-    def check_vertically(self, char, pos_x, pos_y):
-        if len(self.board[pos_x]) < 4:
-            return False
-        column = self.board[pos_x]
-        if char == column[pos_y-1] == column[pos_y-2] == column[pos_y-3]:
-            return True
-        return False
-
-    def check_horizontally(self, char, pos_x, pos_y):
-        result = False
-        for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or self.check_horizontally_aux(char, pos_x, pos_y, a, b, c)
-        # result = False
-        # if pos_x >= 3:
-        #     result = result or check_horizontally_aux(self, char, pos_x, pos_y, -1, -2, -3)
-        # if pos_x >= 2 and len(self.board)-pos_x >= 1:
-        #     result = result or check_horizontally_aux(self, char, pos_x, pos_y, -1, -2, 1)
-        # if pos_x >= 1 and len(self.board)-pos_x >= 2:
-        #     result = result or check_horizontally_aux(self, char, pos_x, pos_y, -1, 1, 2)
-        # if len(self.board)-pos_x >= 3:
-        #     result = result or check_horizontally_aux(self, char, pos_x, pos_y, 1, 2, 3)
-        return result
-
-    def check_horizontally_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
-        if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
-            return False
-        try:
-            if char == self.board[pos_x+offset_1][pos_y] == self.board[pos_x+offset_2][pos_y] == self.board[pos_x+offset_3][pos_y]:
-                return True
-            return False
-        except:
-            return False
-
-    def check_identity_diagonal(self, char, pos_x, pos_y):
-        result = False
-        for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or self.check_identity_diagonal_aux(char, pos_x, pos_y, a, b, c)
-        return result
-
-    def check_identity_diagonal_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
-        if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
-            return False
-        if (pos_y+offset_1 < 0 or pos_y+offset_2 < 0 or pos_y+offset_3 < 0):
-            return False
-        try:
-            if char == self.board[pos_x+offset_1][pos_y+offset_1] == self.board[pos_x+offset_2][pos_y+offset_2] == self.board[pos_x+offset_3][pos_y+offset_3]:
-                return True
-            return False
-        except:
-            return False
-
-    def check_not_identity_diagonal(self, char, pos_x, pos_y):
-        result = False
-        for a,b,c in [(-1,-2,-3), (-1,-2,1), (-1,1,2), (1,2,3)]:
-            result = result or self.check_not_identity_diagonal_aux(char, pos_x, pos_y, a, b, c)
-        return result
-
-    def check_not_identity_diagonal_aux(self, char, pos_x, pos_y, offset_1, offset_2, offset_3):
-        if (pos_x+offset_1 < 0 or pos_x+offset_2 < 0 or pos_x+offset_3 < 0):
-            return False
-        if (pos_y-offset_1 < 0 or pos_y-offset_2 < 0 or pos_y-offset_3 < 0):
-            return False
-        try:
-            if char == self.board[pos_x+offset_1][pos_y-offset_1] == self.board[pos_x+offset_2][pos_y-offset_2] == self.board[pos_x+offset_3][pos_y-offset_3]:
-                return True
-            return False
-        except:
-            return False
 
 class Player(object):
     def __init__(self):
@@ -272,7 +266,7 @@ class QLearningPlayer(Player):
       return m[0:-1]
 
 class SmartQLearningPlayer(QLearningPlayer):
-    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9): 
+    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
         self.breed = "SQlearner"
         self.q = {} # (state, action) keys: Q values
         self.epsilon = epsilon # e-greedy chance of random exploration
@@ -377,12 +371,78 @@ class SmartQLearningPlayer(QLearningPlayer):
         m+=line[3] + str(line[0]) + str(line[1]) + str(line[2])
       return m
 
+class MinimaxPlayer(Player):
+    def __init__(self):
+        self.breed = "minimax"
+        self.best_moves = {}
+
+    def start_game(self, char, width):
+        self.me = char
+        self.enemy = self.other(char)
+
+    def other(self, char):
+        return '1' if char == '2' else '2'
+
+    def move(self, board, height):
+        # print board
+        asd = tuple([tuple(column) for column in board])
+        if asd in self.best_moves:
+            return random.choice(self.best_moves[asd])
+        if board_empty(board):
+            return len(board)/2
+        best_yet = -2
+        choices = []
+        for move in self.available_moves(board, height):
+            board[move].append(self.me)
+            optimal = self.minimax(board, self.enemy, -2, 2, move, height)
+            board[move].pop()
+            if optimal > best_yet:
+                choices = [move]
+                best_yet = optimal
+            elif optimal == best_yet:
+                choices.append(move)
+        self.best_moves[asd] = choices
+        return random.choice(choices)
+
+    def minimax(self, board, char, alpha, beta, column, height):
+        # print alpha
+        # print beta
+        if player_wins(self.me, column, board):
+            return 1
+        if player_wins(self.enemy, column, board):
+            return -1
+        if board_full(board, height):
+            return 0
+        # print self.available_moves(board, height)
+        for move in self.available_moves(board, height):
+            board[move].append(char)
+            val = self.minimax(board, self.other(char), alpha, beta, column, height)
+            board[move].pop()
+            if char == self.me:
+                if val > alpha:
+                    alpha = val
+                if alpha >= beta:
+                    return beta
+            else:
+                if val < beta:
+                    beta = val
+                if beta <= alpha:
+                    return alpha
+        if char == self.me:
+            return alpha
+        else:
+            return beta
+
+    def reward(self, value, board, height):
+        pass
+
 p1 = None
 p2 = None
 key1 = '-'
 key2 = '-'
 
 to_save = False
+
 
 def save_player(key,player,whichplayer,other):
     if key == "q" or key == "s":
@@ -397,7 +457,7 @@ def save_player(key,player,whichplayer,other):
         f.close()
 
 def load_player(key,players):
-    if key in ('q','r','s','h'):
+    if key in ('q','r','s','h','m'):
         player = players[key]
     elif os.path.isfile(key):
         print "Cargando el modelo entrenado de " + key + ". Espere por favor..."
@@ -444,8 +504,8 @@ if __name__ == "__main__":
     else:
         iterations = int(sys.argv[3])
 
-    players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
-    players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player()}
+    players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player(), 'm':MinimaxPlayer()}
+    players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player(), 'm':MinimaxPlayer()}
 
     p1 = load_player(key1,players1)
     p2 = load_player(key2,players2)
@@ -457,8 +517,8 @@ if __name__ == "__main__":
         print "#iter", str(iterations)
 
     var_epsilon = False
-#    size = (4, 4)
-    size = (7, 6)
+    size = (4, 4)
+    # size = (7, 6)
 
     if train_or_play == 'train':
         save_train_data(["0\t0\n","0\t0\n"],'w')
