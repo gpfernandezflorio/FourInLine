@@ -3,6 +3,7 @@
 \usepackage{graphicx}                   % Gráficos
 \usepackage[spanish]{babel}             % Macros en español
 \usepackage{caratula}                   % Carátula
+\usepackage{geometry}                   % Márgenes
 \begin{document}
 
 
@@ -34,22 +35,29 @@ cuán rápido se puede explorar?, ¿cómo cambia la inicialización de Q con res
 
 ¿Cuál es el espacio de estados?, ¿cuán rápido se puede explorar?, ¿cómo cambia la inicialización de Q con respecto a la velocidad de aprendizaje?, ¿qué importancia tiene la temperatura y la velocidad con que se enfría el sistema si se decide usar la distribution Boltzmann?, ¿qué efecto tiene cambiar la tasa de aprendizaje?, etc.
 
+\newgeometry{left=1cm,right=1cm}
 
-\begin{figure}[h]
+\begin{figure}[ht]
  \centering
   \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.2]{GammaR.png}
-	\includegraphics[scale=0.2]{GammaQ.png}
-  \end{minipage}
-  \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.2]{AlphaR.png}
-	\includegraphics[scale=0.2]{AlphaQ.png}
-  \end{minipage}
-  \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.2]{EpsilonR.png}
-	\includegraphics[scale=0.2]{EpsilonQ.png}
+	\includegraphics[scale=0.32]{GammaR.png}
+	\includegraphics[scale=0.32]{GammaQ.png}
   \end{minipage}
 \end{figure}
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+	\includegraphics[scale=0.32]{AlphaR.png}
+	\includegraphics[scale=0.32]{AlphaQ.png}
+  \end{minipage}
+\end{figure}
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+	\includegraphics[scale=0.32]{EpsilonR.png}
+	\includegraphics[scale=0.32]{EpsilonQ.png}
+  \end{minipage}
+\end{figure}
+
+\restoregeometry
 
 Conclusiones: El jugador 1 aprendió la estrategia ganadora! Felicitaciones.
 
