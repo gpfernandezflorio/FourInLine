@@ -108,6 +108,19 @@ class FourInLine:
         self.red, self.blue = player1, player2
         self.turn = random.choice(['1', '2'])
         #self.turn = '1'
+        self.rWin = 1
+        self.rLoss = -1
+        self.rTie = 0.5
+        self.rTurn = 0
+
+    def set_reward_win(self, x):
+        self.rWin = x
+    def set_reward_loss(self, x):
+        self.rLoss = x
+    def set_reward_tie(self, x):
+        self.rTie = x
+    def set_reward_turn(self, x):
+        self.rTurn = x
 
     def play_game(self, play=False):
         self.red.start_game('1',len(self.board))
@@ -123,20 +136,20 @@ class FourInLine:
             column = player.move(self.board,self.height)
             self.board[column].append(char)
             if player_wins(char,column, self.board):
-                player.reward(1, self.board, self.height)
-                other_player.reward(-1, self.board,self.height)
+                player.reward(self.rWin, self.board, self.height)
+                other_player.reward(self.rLoss, self.board,self.height)
                 if play:
                     display_board(self.board, self.height)
                     print "Jugador " + self.turn + " GANA! (" + player.breed + ")"
                 return self.turn
             if board_full(self.board, self.height): # tie game
-                player.reward(0.5, self.board, self.height)
-                other_player.reward(0.5, self.board,self.height)
+                player.reward(self.rTie, self.board, self.height)
+                other_player.reward(self.rTie, self.board,self.height)
                 if play:
                     display_board(self.board, self.height)
                     print "EMPATE!"
                 return "0"
-            other_player.reward(0, self.board,self.height)
+            other_player.reward(self.rTurn, self.board,self.height)
             if self.turn == '1':
                 self.turn = '2'
             else:
@@ -440,23 +453,45 @@ def signal_handler(signal, frame):
     to_save = True
 
 if __name__ == "__main__":
-    print 'Number of arguments:', len(sys.argv), 'arguments.'
+    print 'Number of arguments:', (len(sys.argv)-1), 'arguments.'
     if len(sys.argv) < 3:
         print "Error: expected at least 2 arguments"
         exit()
     print 'Argument List:', str(sys.argv)
-    key1 = sys.argv[1]
-    key2 = sys.argv[2]
-    if len(sys.argv) < 4:
-        iterations = -1
+    modo = sys.argv[1]
+    if modo == 'p':
+        #MODO PARÁMETROS
+        if len(sys.argv) < 14:
+            print "Error: expected at least 14 arguments"
+            print "Modo de Uso: python fourInLine.py p k1 k2 alpha1 gamma1 epsilon1 alpha2 gamma2 epsilon2 win tie loss turn saveDict [iterations]"
+            exit()
+        key1 = sys.argv[2]
+        key2 = sys.argv[3]
+        if len(sys.argv) < 16:
+            iterations = -1
+        else:
+            iterations = int(sys.argv[15])
     else:
-        iterations = int(sys.argv[3])
+        key1 = sys.argv[1]
+        key2 = sys.argv[2]
+        if len(sys.argv) < 4:
+            iterations = -1
+        else:
+            iterations = int(sys.argv[3])
 
     players1 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player(), 'm':MinimaxPlayer()}
     players2 = {'q': QLearningPlayer(), 'r': RandomPlayer(), 's':SmartQLearningPlayer(), 'h':Player(), 'm':MinimaxPlayer()}
 
     p1 = load_player(key1,players1)
     p2 = load_player(key2,players2)
+
+    if modo == 'p':
+        p1.set_alpha(float(sys.argv[4]))
+        p1.set_gamma(float(sys.argv[5]))
+        p1.set_epsilon(float(sys.argv[6]))
+        p2.set_alpha(float(sys.argv[7]))
+        p1.set_gamma(float(sys.argv[8]))
+        p1.set_epsilon(float(sys.argv[9]))
 
     if p1.breed == "human" or p2.breed == "human":
         train_or_play =  "play"
@@ -482,6 +517,11 @@ if __name__ == "__main__":
               to_save = False
             k+=1
             t = FourInLine(p1, p2, size[0], size[1])
+            if modo == 'p':
+                t.set_reward_win(float(sys.argv[10]))
+                t.set_reward_tie(float(sys.argv[11]))
+                t.set_reward_loss(float(sys.argv[12]))
+                t.set_reward_turn(float(sys.argv[13]))
             winner = t.play_game(False)
             tot += 1
             if winner!=0:
@@ -500,7 +540,11 @@ if __name__ == "__main__":
                   res = ["",""]
 
         save_train_data(res,'a')
-        save_players(tot)
+        if modo == 'p':
+            if (sys.argv[14]=="1"):
+                save_player(key1,p1,"1",p2.breed)
+        else:
+            save_players(tot)
 
     else:
         print "A jugar"
