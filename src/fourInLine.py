@@ -154,6 +154,8 @@ class Player(object):
         pass
     def set_alpha(self, a):
         pass
+    def other(self, char):
+        return '1' if char == '2' else '2'
 
     def move(self, board, height):
         x = len(board)
@@ -266,14 +268,13 @@ class QLearningPlayer(Player):
       return m[0:-1]
 
 class SmartQLearningPlayer(QLearningPlayer):
-    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9):
-        self.breed = "SQlearner"
+    def __init__(self, epsilon=0.2, alpha=0.3, gamma=0.9): #epsilon=0.2, alpha=0.3, gamma=0.9
+        self.breed = "SmartQlearner"
         self.q = {} # (state, action) keys: Q values
         self.epsilon = epsilon # e-greedy chance of random exploration
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor for future rewards
         self.me = "?"
-
     def start_game(self, char, width):
         self.last_board = []
         for i in range(width):
@@ -281,95 +282,45 @@ class SmartQLearningPlayer(QLearningPlayer):
         self.last_move = None
         self.mm = ""
         self.me = char
-        self.myLines = []
-        self.enLines = []
+        self.enemy = self.other(char)
 
-    def decide(self):
-      try:
-        x = int(self.last_move)
-        return x
-      except ValueError:
-        if self.last_move[0] == "M":
-          line = self.myLines[int(self.last_move[1:])]
+    def move(self, board, height):
+        self.last_board = board
+        self.mm = self.make_matrix(board, height)
+        actions = self.available_moves(board, height)
+
+        for a in actions:
+            board[a].append(self.me)
+            if player_wins(self.me, a, board):
+                board[a].pop()
+#                print "Voy a ganar si pongo en " + str(a+1)
+                return a
+            board[a].pop()
+        for a in actions:
+            board[a].append(self.enemy)
+            if player_wins(self.enemy, a, board):
+                board[a].pop()
+#                print "Voy a perder si no pongo en " + str(a+1)
+                return a
+            board[a].pop()
+
+        if random.random() < self.epsilon: # explore!
+            self.last_move = random.choice(actions)
+            return self.decide()
+
+        qs = [self.getQ(self.mm, a) for a in actions]
+        maxQ = max(qs)
+
+        if qs.count(maxQ) > 1:
+            # more than 1 best option; choose among them randomly
+            best_options = [i for i in range(len(actions)) if qs[i] == maxQ]
+            i = random.choice(best_options)
         else:
-          line = self.enLines[int(self.last_move[1:])]
-        if line[3] == 'v':
-          return line[1]
-        elif line[3] == 'h':
-          return line[1]+line[0]
-        elif line[3] == 'H':
-          return line[1]-1
+            i = qs.index(maxQ)
 
-    def available_moves(self, board, height):
-        result = []
-        for i in range(len(self.myLines)):
-          if self.myLines[i][1] + self.myLines[i][0] < height:
-            result.append("M"+str(i))
-        for i in range(len(self.enLines)):
-          if self.enLines[i][1] + self.enLines[i][0] < height:
-            result.append("E"+str(i))
-        if len(result)==0:
-          return [i for i in range(len(board))]
-        return result
-
-    #LINE : [longitud, columna, fila, orientación]
-    def make_matrix(self, board, height):
-      start = '-'
-      line = None
-      myLines = []
-      enLines = []
-      #Verticales
-      for j in range(len(board)):
-        column = board[j]
-        if (len(column) > 0):
-          start = column[0]
-          line = [1,j,0,'v']
-          for i in range(1,len(column)):
-            if column[i]==start:
-              line[0] += 1
-            else:
-              line = [1,j,i,'v']
-              start = column[i]
-          if start==self.me:
-            myLines.append(line)
-          else:
-            enLines.append(line)
-      #Horizontales
-      for i in range(height):
-        k = 0
-        for k in range(len(board)):
-          if len(board[k]) > i:
-            start = board[k][i]
-            line = [1,k,i,'h']
-            break
-        if k != len(board):
-            for j in range(k+1,len(board)):
-                if len(board[j]) <= i:
-                  if len(board[j])==i-1 and line != None:
-                      if start == self.me:
-                        myLines.append(line)
-                      else:
-                        enLines.append(line)
-                  line = None
-                else:
-                    if line == None:
-                        start = board[j][i]
-                        line = [1,j,i,'h']
-                    elif board[j][i]==start:
-                        line[0] += 1
-                    else:
-                      start = board[j][i]
-                      line = [1,j,i,'h']
-      if board==self.last_board:
-        self.myLines = myLines
-        self.enLines = enLines
-      m = ""
-      for line in myLines:
-        m+=line[3] + str(line[0]) + str(line[1]) + str(line[2])
-      m+=";"
-      for line in enLines:
-        m+=line[3] + str(line[0]) + str(line[1]) + str(line[2])
-      return m
+        self.last_move = actions[i]
+        return self.decide()
+    
 
 class MinimaxPlayer(Player):
     def __init__(self):
@@ -379,9 +330,6 @@ class MinimaxPlayer(Player):
     def start_game(self, char, width):
         self.me = char
         self.enemy = self.other(char)
-
-    def other(self, char):
-        return '1' if char == '2' else '2'
 
     def move(self, board, height):
         # print board
@@ -516,9 +464,8 @@ if __name__ == "__main__":
         train_or_play =  "train"
         print "#iter", str(iterations)
 
-    var_epsilon = False
-    size = (4, 4)
-    # size = (7, 6)
+    #size = (4, 4)
+    size = (7, 6)
 
     if train_or_play == 'train':
         save_train_data(["0\t0\n","0\t0\n"],'w')
@@ -528,27 +475,12 @@ if __name__ == "__main__":
         c1 = 1
         c2 = 100
         k = 0
-        p1.set_epsilon(0.2)
-        p2.set_epsilon(0.2)
         signal.signal(signal.SIGINT, signal_handler)
         while (tot != iterations):
             if to_save:
               save_players(tot)
               to_save = False
             k+=1
-            if var_epsilon:
-                if tot == 50000:
-                    p1.set_epsilon(0.5)
-                    p2.set_epsilon(0.5)
-                elif tot == 200000:
-                    p1.set_epsilon(0.3)
-                    p2.set_epsilon(0.3)
-                elif tot == 400000:
-                    p1.set_epsilon(0.2)
-                    p2.set_epsilon(0.2)
-                elif tot == 1000000:
-                    p1.set_epsilon(0.1)
-                    p2.set_epsilon(0.1)
             t = FourInLine(p1, p2, size[0], size[1])
             winner = t.play_game(False)
             tot += 1
