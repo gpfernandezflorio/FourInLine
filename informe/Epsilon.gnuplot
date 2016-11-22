@@ -4,7 +4,7 @@ set key bottom maxrows 6
 set xlabel "Cantidad de iteraciones"
 set ylabel "Proporción de victorias"
 
-set xrange[:200000]
+set xrange[:1000000]
 set yrange[0.2:0.85]
 
 set title "vs Random variando {/Symbol e}"
