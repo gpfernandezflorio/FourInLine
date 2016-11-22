@@ -86,6 +86,16 @@ Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fi
 	\caption{Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs. un jugador Random y vs. otro jugador QLearner). Si bien se recomienda no usar $\gamma = 1$, en nuestro caso es posible hacerlo ya que no puede diverger el valor de Q para un estado ya que el tablero es finito. }
   \end{minipage}
 \end{figure}
+\subsubsection{Experimentacion con Alpha}
+\begin{figure}[H]
+  \begin{minipage}[c]{1\textwidth}
+  \includegraphics[scale=0.25]{AlphaR.png}
+  \includegraphics[scale=0.25]{AlphaQ.png}
+  \includegraphics[trim=230mm 185mm 13mm 90mm, clip, scale=2]{AlphaR.png}
+  \includegraphics[trim=235mm 125mm 0mm 150mm, clip, scale=2]{AlphaQ.png}
+  \caption{Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.}
+  \end{minipage}
+\end{figure}
 \subsubsection{Experimentacion con Epsilon}
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
@@ -94,36 +104,35 @@ Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fi
 	\caption{En este caso, no  hay un claro valor óptimo. Sin embargo elegimos seguir con $\epsilon=0.2$ ya que en ambos casos termina segundo en cuanto a la cantidad de victorias después de un millón de iteraciones.}
   \end{minipage}
 \end{figure}
-\subsubsection{Experimentacion con Alpha}
-\begin{figure}[H]
-  \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.25]{AlphaR.png}
-	\includegraphics[scale=0.25]{AlphaQ.png}
-	\includegraphics[trim=230mm 185mm 13mm 90mm, clip, scale=2]{AlphaR.png}
-	\includegraphics[trim=235mm 125mm 0mm 150mm, clip, scale=2]{AlphaQ.png}
-	\caption{Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.}
-  \end{minipage}
-\end{figure}
 
 
 \subsection{Experimentos con parámetros ajustados}
 
-En esta etapa de la experimentación nos hicimos varios interrogantes:
-¿Cuándo generamos un mejor jugador QLearner?
-¿Cuando lo entrenamos con otro QLearner, ó con un Random? \\
+Luego una vez que ya definidos nuestros parámetros ($\alpha=0.3$, $\gamma=1.0$, $\epsilon=0.2$) del QLP, nos pusimos a pensar en otro tipo de experimentación y nos surgieron las siguientes dudas, algunas de ellas fueron:\\
+¿Cuándo se genera un mejor jugador QLearner? \\
+¿Cuándo es mejor entrenarlo contra otro QLearner, ó contra un Random? \\
 ¿Cambia la performance de un jugador si se entrena en distinto orden con un Random y después con un QLearner?\\
-¿Es mejor un jugador si se lo entrena con otro ``mejor''?
+¿Es mejor un jugador si se lo entrena con otro ``mejor''?\\
+
+Entonces para atacar estas preguntas e intentar responderlas se nos ocurrio realizar los siguientes experimentos:
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
-  \includegraphics[scale=0.5]{E1.png}
-  \includegraphics[scale=0.5]{E2.png}
-  \includegraphics[scale=0.5]{E3.png}
-  \caption{En el primer caso, compiten dos jugadores QLearner, uno entrenado con un QLearner y el otro entrenado con un jugador Random.
-  En el segundo caso, compiten dos QLearner que se entrenaron con un jugador QLearner y uno Random, pero cada uno en distinto orden.
-  En el tercer caso, compiten los jugadores del caso 2 pero entrenados también con un jugador SQLearner.  Todos los entrenamientos fueron de 1000000 iteraciones. }
+    \begin{center}
+    \includegraphics[scale=0.5]{E1.png}
+    \includegraphics[scale=0.5]{E2.png}
+    \includegraphics[scale=0.5]{E3.png}
+    \end{center}
   \end{minipage}
 \end{figure}
+
+En todos los experimentos planteamos primero una fase de entrenamiento, donde entrenamos distintos QLP antes distintos jugadores, donde cada entrenamiento es de 1 millon de iteraciones y luego una fase de competencia, donde enfrentamos a los QLP entrenados entre si, cambiando los parámetros del modelo para que no aprendan mas y juegan 10 mil iteraciones.
+
+En el primer experimento, el de la izquierda de la figura, entrenamos dos QLP uno contra otro QLP y otro contra un Random y luego compiten entre si.\\
+
+En el segundo experimento, el del medio de la figura, extendemos el experimento anterior agrandando la fase de entrenamiento, haciendo que cada QLP entrenado vuelva a entrenar pero contra el jugador que no le habia tocado en el caso anterior. Es decir tenemos por un lado un QLP entrenado contra otro QLP y luego con un Random y por otro lado un QLP entrenado contra un Random y contra otro QLP. Luego ponemos a competir estos dos QLP entrenados.\\
+
+Por ultimo en el tercer experimento, incluimos un nuevo tipo de jugador SmartQLearnerPlayer y hacemos una experimentacion similar al experimento uno pero agregando un QLP, que entrena contra este SQLP y luego compiten los tres QLP entre si.\\
 
 
 \subsubsection{Caso 1(QQ vs QR)}
