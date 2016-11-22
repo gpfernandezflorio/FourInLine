@@ -4,9 +4,10 @@
 \usepackage[spanish]{babel}             % Macros en español
 \usepackage{caratula}                   % Carátula
 \usepackage{geometry}                   % Márgenes
-\usepackage{listings}
-\usepackage{float}
+\usepackage{listings}					% Codigo
+\usepackage{float}						% Posicion de Imagenes
 \begin{document}
+
 
 %Caratula
 \titulo{Trabajo Práctico 2}
@@ -17,63 +18,68 @@
 \integrante{Aleman, Damian}{377/10}{damianealeman@gmail.com}
 \integrante{Pizzagalli, Matías}{257/10}{matipizza@gmail.com}
 
+
 %Titulo e indice
 \maketitle
 \tableofcontents
 \newpage
 
+
 \section{Introducción}
 
-\subsection{¿Cuál es el espacio de estados?}
 
-Cada configuracion posible del tablero es un estado, es decir guardamos para cada posición del tablero si hay una ficha y de que jugador. Muchos de esos estados son inalcanzables, ya que toda ficha debe estar inmediatamente por encima de otra ficha. Tampoco consideramos estados en los que hay cuatro fichas alineadas (ya sea de forma vertical, horizontal o diagonal). 
-Cada accion se corresponde con insertar una ficha en alguna de las columnas. La ficha será asignada a la fila inmediatamente superior a la fila donde estaba la ficha más arriba en la misma columna.
+En el presente trabajo práctico se analiza la estrategia de Aprendizaje Automático basado en Refuerzos para la implementación de un programa que simule un jugador del juego Cuatro en Línea. El algoritmo de aprendizaje utilizado es Q-Learning. Se utiliza como base una implementación en python del juego Ta-Te-Ti y un jugador Q-Learning para ese juego. A partir de esta implementación, se busca obtener un jugador para el Cuatro en línea que aprenda al mismo ritmo que el jugador de Ta-Te-Ti.
+
+
+\subsection{Descripción del algoritmo de Q-Learning}
+
+
+El primer paso para desarrollar un algoritmo Q-Learning es definir el espacio de estados y posibles acciones asociadas a tales estados. La implementación base de Ta-Te-Ti modela cada estado como una matriz de 3 por 3, representado el tablero en cada momento de la partida. Las acciones a tomar son cada ubicación libre del tablero, es decir, de la matriz.
+
+
+En nuestro caso, cada configuración posible del tablero es un estado, es decir guardamos para cada posición del tablero si hay una ficha y de qué jugador. Muchos de esos estados son inalcanzables, ya que toda ficha debe estar inmediatamente por encima de otra ficha. Tampoco consideramos estados en los que hay cuatro fichas alineadas (ya sea de forma vertical, horizontal o diagonal). 
+Cada acción se corresponde con insertar una ficha en alguna de las columnas. La ficha será asignada a la fila inmediatamente superior a la fila donde estaba la ficha más arriba en la misma columna. En lugar de almacenar los estados como matrices, mantenemos un arreglo de Columnas, donde cada Columna no es más que una lista de caracteres, inicialmente vacía. Insertar una ficha en la columna $x$, consiste en agregar un caracter a la $x$-ésima lista del arreglo.
+
 
 Las recompensas a las acciones tomadas se otorgan después de que juegue el rival, excepto en los casos en los que la partida finaliza.
 
 
-En este trabajo observamos cuanto aprenden los modelos a partir de la cantidad de victorias que tienen contra otros modelos.
+En este trabajo observamos cuánto aprenden los modelos a partir de la cantidad de victorias que tienen contra otros modelos.
 Hay muchos parámetros en el modelo que se podían modificar para variar:
-\begin{itemize}
-	\item $\epsilon$
-	\item $\gamma$
-	\item $\alpha$
-	\item Recompensa por ganar el partido
-	\item Recompensa por perder el partido
-	\item Recompensa por empatar el partido
-	\item Recompensa por un nuevo turno
-	\item La cantidad de iteraciones que se entreno
+$\epsilon$,  $\gamma$, $\alpha$, recompensa por ganar(perder o empatar) el partido, recompensa por un nuevo turno y la cantidad de iteraciones que se entrena.
 
-\end{itemize}
-
-
-
-¿Cuál es el espacio de estados?, ¿cuán rápido se puede explorar?, ¿cómo cambia la inicialización de Q con respecto a la velocidad de aprendizaje?, ¿qué importancia tiene la temperatura y la velocidad con que se enfría el sistema si se decide usar la distribution Boltzmann?, ¿qué efecto tiene cambiar la tasa de aprendizaje?, etc.
 
 \section{Experimentación}
 
+
 \subsection{Experimentación Inicial}
 
-Primero hicimos competir al QLP contra el jugador Random y contra otro QLP.
+
+Primero hicimos competir al QLP contra el jugador Random y contra otro QLP. Todos los parámetros se asignaron al valor por defecto. A continuación se muestran los resultados obtenidos.
+
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
 	\includegraphics[scale=0.2]{Initial/QvR.png}
 	\includegraphics[scale=0.2]{Initial/QvQ.png}
   \end{minipage}
+  \caption{Proporción de victorias de cada jugador a medida que se van entrenando. Podemos ver como, al jugar contra un jugador random, el jugador QLP aprende una estrategia para vencerlo y a partir de cierto punto, pareciera ganar la mayor parte de las veces, con lo cuál, su proporción de victorias sólo aumenta. En el caso de los dos jugadores QLP, parecieran retroalimentarse de forma que ambos tienden a ganar el $50\%$ de las veces. A diferencia de lo que se observó en el caso del Ta-Te-Ti, el ratio de empates es muy bajo.}
 \end{figure}
+
 
 \subsection{Ajuste de parámetros}
 
-Experimentamos variando los parámetros $\alpha$, $\gamma$ y $\epsilon$ por separado, haciéndolo competir contra un jugador Random y contra un jugador con los parámetros por defecto ($\alpha=0.3,\gamma=0.9 y \epsilon=0.2$).
-Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fijan tambien en los valores por defecto ya mencionados.
+
+Experimentamos variando los parámetros $\alpha$, $\gamma$ y $\epsilon$ por separado, haciéndolo competir contra un jugador Random y contra un jugador con los parámetros por defecto ($\alpha=0.3$,$\gamma=0.9$ y $\epsilon=0.2$).
+Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fijan también en los valores por defecto ya mencionados.
+
 
 \begin{figure}[H]
  \centering
   \begin{minipage}[c]{1\textwidth}
 	\includegraphics[scale=0.2]{GammaR.png}
 	\includegraphics[scale=0.2]{GammaQ.png}
-	\caption{Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs un jugador random y vs otro jugador QLearner).}
+	\caption{Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs un jugador random y vs otro jugador QLearner). Si bien se recomienda no usar $\gamma = 1$, en nuestro caso es posible hacerlo ya que no puede diverger el valor de Q para un estado ya que el tablero es finito. }
   \end{minipage}
 \end{figure}
 \begin{figure}[H]
@@ -96,72 +102,86 @@ Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fi
 
 \subsection{Experimentos con parámetros ajustados}
 
-Explicacion de que llamamos competencia
+En esta etapa de la experimentación nos preguntamos cuándo generamos un mejor jugador QLearner: \\
+¿Cuando lo entrenamos con otro QLearner o con un random?
+¿Cambia la performance de un jugador si se entrena en distinto orden con un random y después con un QLearner?
+¿Es mejor un jugador si se lo entrena con otro mejor?
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
-  \includegraphics[scale=0.4]{E1.png}
-  \includegraphics[scale=0.4]{E2.png}
-  \includegraphics[scale=0.4]{E3.png}
+  \includegraphics[scale=0.5]{E1.png}
+  \includegraphics[scale=0.5]{E2.png}
+  \includegraphics[scale=0.5]{E3.png}
+  \caption{En el primer caso, compiten dos jugadores QLearner, uno entrenado con un QLearner y el otro entrenado con un jugador randmom.
+  En el segundo caso, compiten dos QLearner que se entrenaron con un jugador QLearner y uno random, pero cada uno en distinto orden.
+  En el tercer caso, compiten los jugadores del caso 2 pero entrenados también con un jugador SQLearner.  Todos los entrenamientos fueron de 1000000 iteraciones. }
   \end{minipage}
 \end{figure}
 
+
 \subsubsection{Caso 1(QQ vs QR)}
 
-Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
+
+En este experimento entrenamos un QLearner contra un random y lo hacemos competir contra uno que fue entrenado con otro QLearner:
+
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
   \includegraphics[scale=0.2]{E1train.png}
   \includegraphics[scale=0.3]{QRvsQQ.png}
+  \caption{Aquí vemos como el jugador entrenado con un QLearner gana con una amplia diferencia. Creemos que esto se debe a que cuando se entrena con un jugador random no puede aprender con facilidad que movimientos son buenos y cuales malos, debido a la aleatoriedad de las jugadas del random. En cambio el entrenado con un QLearner tiene mayor coherencia en sus movimientos y esto genera un mejor aprendizaje.}
   \end{minipage}
 \end{figure}
 
 \subsubsection{Caso 2(QQR vs QRQ)}
 
-Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
+
+En este caso queremos ver si cambia el aprendizaje según el orden de entrenamiento entre modelos. A cada modelo lo entrenamos con un random y otro QLearner pero en distinto orde y los hacemos competir:
+
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
   \includegraphics[scale=0.2]{E2train.png}
   \includegraphics[scale=0.3]{QQRvsQRQ.png}
+  {\caption Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno random y con un QLearner. Lo que suponemos que está generando esto es que cuando se entrena con el random desaprende lo visto anteriormente logrando así una peor performance.}
   \end{minipage}
 \end{figure}
+
 
 \subsubsection{Caso 3(QQ vs QR vs QS)}
 
+Dado que queríamos seguir mejorando el jugador QLearner, nos propusimos agregar un modelo de jugador más inteligente para que lo entrene.  Realizamos entonces un jugador , que llamaremos SQLearner, que aprende como un QLearner pero antes de realizar una movida primero se fija si puede ganar, en ese caso inserta la ficha en la posición ganadora. En caso contrario, se fija si tiene que insertar una ficha para no perder con una jugada del rival. Si tampoco es el caso realiza una jugada como cualquier QLearner.
+En los siguientes gráficos mostramos los modelos que entrenamos y cómo compiten entre ellos:
+
 Explicacion de que es el S Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
+
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
-  \includegraphics[scale=0.3]{QQvsQR.png}
+ % \includegraphics[scale=0.2]{E3train.png}
+ % \includegraphics[scale=0.3]{QQvsQR.png}
   \includegraphics[scale=0.3]{QRvsQS.png}
   \includegraphics[scale=0.3]{QQvsQS.png}
+  \caption{A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dio un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
+  Otra sorpresa es que el jugador random genera más victorias que el QLearner cuando compiten contra el SQLearner }
   \end{minipage}
 \end{figure}
 
-Ideas que no llegamos a hacer ???
 
-Contar de la idea de implementar un minimax, pero que no lo pusimos en practica porque era infinito.
-
-variando las recompensas?
-
-q(vsRandom) vs q(vsQ) con epsilon 0, osea no siguen aprendiendo.
-
-
-4x4 y ver si eso lleva a  mas empates
-comparar si cambiamos ganancia de empate a 0.
-¿juagada ganadora? Veamos si siempre empieza el jugador 1.
-
-
-
-
-
+%Ideas que no llegamos a hacer ???
+%Contar de la idea de implementar un minimax, pero que no lo pusimos en practica porque era infinito.
+%variando las recompensas?
+%4x4 y ver si eso lleva a  mas empates
+%comparar si cambiamos ganancia de empate a 0.
+%¿juagada ganadora? Veamos si siempre empieza el jugador 1.
 
 \section{Conclusiones}
+En principio logramos ver cuáles son los parámetros óptimos para un jugador QLearner: $\alpha=0.3$,$\gamma=1$ y $\epsilon=0.2$.
+Por otro lado observamos que es mejor entrenar un jugador QLearner con otro QLearner que con un jugador random.
+Si bien no pudimos obtener un jugador que sea un oponente decente para un humano, es un jugador que aprende y que le gana por una amplia diferencia a un jugador random.
+
 
 \section{Como ejecutar el tp}
-
 
 
 En el caso en los que los valores de $\alpha$, $\gamma$ y $\epsilon$ son por defecto:
@@ -172,5 +192,6 @@ donde key son los tipos de jugadores. Caso contrario: \\
 \begin{lstlisting}
 python fourInLine.py p key1 key2 a1 g1 e1 a2 g2 e2 rw rt rl rr save [iters]
 \end{lstlisting}
+
 
 \end{document}
