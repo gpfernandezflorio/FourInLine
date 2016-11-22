@@ -7,6 +7,22 @@
 \usepackage{listings}
 \begin{document}
 
+%Caratula
+\titulo{Trabajo Práctico 2}
+\subtitulo{Cuatro en Línea}
+\fecha{\today}
+\materia{Aprendizaje Automático}
+\integrante{Fernández, Gonzalo}{836/10}{gpfernandezflorio@gmail.com}
+\integrante{Aleman, Damian}{377/10}{damianealeman@gmail.com}
+\integrante{Pizzagalli, Matías}{257/10}{matipizza@gmail.com}
+
+%Titulo e indice
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introducción}
+
 \subsection{¿Cuál es el espacio de estados?}
 
 Cada configuracion posible del tablero es un estado, es decir guardamos para cada posición del tablero si hay una ficha y de que jugador. Muchos de esos estados son inalcanzables, ya que toda ficha debe estar inmediatamente por encima de otra ficha. Tampoco consideramos estados en los que hay cuatro fichas alineadas (ya sea de forma vertical, horizontal o diagonal). 
@@ -80,7 +96,6 @@ Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fi
 	Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.
   \end{minipage}
 \end{figure}
-
 \restoregeometry
 
 
@@ -88,18 +103,47 @@ Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fi
 
 Explicacion de que llamamos competencia
 
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+  \includegraphics[scale=0.7]{E1.png}
+  \includegraphics[scale=0.7]{E2.png}
+  \includegraphics[scale=0.7]{E3.png}
+  \end{minipage}
+\end{figure}
+
 \subsubsection{Caso 1(QQ vs QR)}
 
 Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
+
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+  \includegraphics[scale=0.32]{E1train.png}
+  \includegraphics[scale=0.4]{QRvsQQ.png}
+  \end{minipage}
+\end{figure}
 
 \subsubsection{Caso 2(QQR vs QRQ)}
 
 Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
 
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+  \includegraphics[scale=0.32]{E2train.png}
+  \includegraphics[scale=0.4]{QQRvsQRQ.png}
+  \end{minipage}
+\end{figure}
+
 \subsubsection{Caso 3(QQ vs QR vs QS)}
 
 Explicacion de que es el S Grafico del entranmiento y grafico de torta/barra con la competencia Resultados
 
+\begin{figure}[ht]
+  \begin{minipage}[c]{1\textwidth}
+  \includegraphics[scale=0.4]{QQvsQR.png}
+  \includegraphics[scale=0.4]{QRvsQS.png}
+  \includegraphics[scale=0.4]{QQvsQS.png}
+  \end{minipage}
+\end{figure}
 
 Ideas que no llegamos a hacer ???
 
