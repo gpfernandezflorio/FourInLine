@@ -134,22 +134,24 @@ En el segundo experimento, el del medio de la figura, extendemos el experimento 
 
 Por ultimo en el tercer experimento, incluimos un nuevo tipo de jugador SmartQLearnerPlayer y hacemos una experimentacion similar al experimento uno pero agregando un QLP, que entrena contra este SQLP y luego compiten los tres QLP entre si.\\
 
+Por un tema de simplicidad nos tomamos la libertad de abreviar los nombres de los jugadores entrenados, entonces por ejemplo al referenciar QQ, nos referimos a un QLP entrenado contra otro QLP, o por ejemplo QRQ, nos referimos a un QLP entrenado contra un Random y luego contra otro QLP y asi todas las combinaciones posibles.
 
-\subsubsection{Caso 1(QQ vs QR)}
+
+\subsubsection{Experimento 1}
 
 
-En este experimento entrenamos un QLearner contra un Random y lo hacemos competir contra uno que fue entrenado con otro QLearner:
+En este experimento, como dijimos antes, entrenamos un QLP contra un Random y lo hacemos competir contra otro QLP que fue entrenado con otro QLP:
 
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
-  \includegraphics[scale=0.2]{E1train.png}
-  \includegraphics[scale=0.45]{QRvsQQ.png}
-  \caption{Aquí vemos como el jugador entrenado con un QLearner gana con una amplia diferencia. Creemos que esto se debe a que cuando se entrena con un jugador Random no puede aprender con facilidad que movimientos son buenos y cuales malos, debido a la aleatoriedad de las jugadas del Random. En cambio, el entrenado con un QLearner tiene mayor coherencia en sus movimientos y esto genera un mejor aprendizaje.}
+    \includegraphics[scale=0.2]{E1train.png}
+    \includegraphics[scale=0.45]{QRvsQQ.png}
   \end{minipage}
 \end{figure}
+Aquí vemos como el QLP entrenado con otro QLearner (al que llamamos QQ) gana con una amplia diferencia. Creemos que esto se debe a que cuando se entrena con un jugador Random no puede aprender con facilidad que movimientos son buenos y cuales malos, debido a la aleatoriedad de las jugadas del Random. En cambio, el entrenado con un QLearner tiene mayor coherencia en sus movimientos y esto genera un mejor aprendizaje.
 
-\subsubsection{Caso 2(QQR vs QRQ)}
+\subsubsection{Experimento 2}
 
 
 En este caso queremos ver si cambia el aprendizaje según el orden de entrenamiento entre modelos. A cada modelo lo entrenamos con un Random y otro QLearner pero en distinto orden y los hacemos competir:
@@ -159,12 +161,13 @@ En este caso queremos ver si cambia el aprendizaje según el orden de entrenamie
   \begin{minipage}[c]{1\textwidth}
   \includegraphics[scale=0.2]{E2train.png}
   \includegraphics[scale=0.45]{QQRvsQRQ.png}
-  \caption {Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno Random y con un QLearner. Lo que suponemos que está generando esto es que en el entrenamiento con el Random desaprende lo visto anteriormente logrando así una peor performance.}
   \end{minipage}
 \end{figure}
 
+Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno Random y con un QLearner. Lo que suponemos que está generando esto es que en el entrenamiento con el Random desaprende lo visto anteriormente logrando así una peor performance.
 
-\subsubsection{Caso 3(QQ vs QR vs QS)}
+
+\subsubsection{Experimento 3(QQ vs QR vs QS)}
 
 Dado que queríamos seguir mejorando el jugador QLearner, nos propusimos agregar un modelo de jugador más inteligente para que lo entrene.  Realizamos entonces un jugador , que llamaremos SQLearner, que aprende como un QLearner pero antes de realizar una movida primero se fija si puede ganar, en ese caso inserta la ficha en la posición ganadora. En caso contrario, se fija si tiene que insertar una ficha para no perder con una jugada del rival. Si tampoco es el caso, realiza una jugada como cualquier QLearner.
 En los siguientes gráficos mostramos los modelos que entrenamos y cómo compiten entre ellos:
