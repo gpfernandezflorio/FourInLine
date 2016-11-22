@@ -317,6 +317,10 @@ class SmartQLearningPlayer(QLearningPlayer):
                 return a
             board[a].pop()
 
+        #RABDOM!
+        self.last_move = random.choice(actions)
+        return self.decide()
+
         if random.random() < self.epsilon: # explore!
             self.last_move = random.choice(actions)
             return self.decide()
