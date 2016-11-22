@@ -1,4 +1,4 @@
-set terminal png 30 size 1080,1080 enhanced
+set terminal png 30 size 1080,720 enhanced
 set logscale x
 set xtics 1,100,1e8
 #set key bottom
