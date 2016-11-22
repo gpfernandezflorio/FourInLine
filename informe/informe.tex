@@ -157,12 +157,12 @@ En los siguientes gráficos mostramos los modelos que entrenamos y cómo compite
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
- % \includegraphics[scale=0.2]{E3train.png}
- % \includegraphics[scale=0.3]{QQvsQR.png}
+  \includegraphics[scale=0.2]{E3train.png}
+  \includegraphics[scale=0.3]{QQvsQR.png}
   \includegraphics[scale=0.3]{QRvsQS.png}
   \includegraphics[scale=0.3]{QQvsQS.png}
   \caption{A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dio un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
-  Otra sorpresa es que el jugador Random genera más victorias que el QLearner cuando compiten contra el SQLearner.}
+  Otra sorpresa es que el jugador entrenado con Random genera más victorias que el entrenado con un QLearner cuando compiten contra el SQLearner.}
   \end{minipage}
 \end{figure}
 
