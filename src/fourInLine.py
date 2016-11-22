@@ -487,11 +487,21 @@ if __name__ == "__main__":
 
     if modo == 'p':
         p1.set_alpha(float(sys.argv[4]))
+        print "Alpha Jugador 1",sys.argv[4]
         p1.set_gamma(float(sys.argv[5]))
+        print "Gamma Jugador 1",sys.argv[5]
         p1.set_epsilon(float(sys.argv[6]))
+        print "Epsilon Jugador 1",sys.argv[6]
         p2.set_alpha(float(sys.argv[7]))
+        print "Alpha Jugador 2",sys.argv[7]
         p1.set_gamma(float(sys.argv[8]))
+        print "Gamma Jugador 2",sys.argv[8]
         p1.set_epsilon(float(sys.argv[9]))
+        print "Epsilon Jugador 2",sys.argv[9]
+        print "Reward Win",sys.argv[10]
+        print "Reward Tie",sys.argv[11]
+        print "Reward Loss",sys.argv[12]
+        print "Reward Turn",sys.argv[13]
 
     if p1.breed == "human" or p2.breed == "human":
         train_or_play =  "play"
