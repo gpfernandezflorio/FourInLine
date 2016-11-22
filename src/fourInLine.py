@@ -333,7 +333,7 @@ class SmartQLearningPlayer(QLearningPlayer):
 
         self.last_move = actions[i]
         return self.decide()
-    
+
 
 class MinimaxPlayer(Player):
     def __init__(self):
@@ -494,9 +494,9 @@ if __name__ == "__main__":
         print "Epsilon Jugador 1",sys.argv[6]
         p2.set_alpha(float(sys.argv[7]))
         print "Alpha Jugador 2",sys.argv[7]
-        p1.set_gamma(float(sys.argv[8]))
+        p2.set_gamma(float(sys.argv[8]))
         print "Gamma Jugador 2",sys.argv[8]
-        p1.set_epsilon(float(sys.argv[9]))
+        p2.set_epsilon(float(sys.argv[9]))
         print "Epsilon Jugador 2",sys.argv[9]
         print "Reward Win",sys.argv[10]
         print "Reward Tie",sys.argv[11]
