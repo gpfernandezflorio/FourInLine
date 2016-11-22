@@ -55,48 +55,42 @@ Hay muchos parámetros en el modelo que se podían modificar para variar:
 
 Primero hicimos competir al QLP contra el jugador Random y contra otro QLP.
 
-\newgeometry{left=1cm,right=1cm}
 \begin{figure}[ht]
   \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.32]{Initial/QvR.png}
-	\includegraphics[scale=0.32]{Initial/QvQ.png}
+	\includegraphics[scale=0.25]{Initial/QvR.png}
+	\includegraphics[scale=0.25]{Initial/QvQ.png}
   \end{minipage}
 \end{figure}
-\restoregeometry
-
-
 
 \subsection{Ajuste de parámetros}
 
 Experimentamos variando los parámetros $\alpha$, $\gamma$ y $\epsilon$ por separado, haciéndolo competir contra un jugador Random y contra un jugador con los parámetros por defecto ($\alpha=0.3,\gamma=0.9 y \epsilon=0.2$).
 Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fijan tambien en los valores por defecto ya mencionados.
 
-\newgeometry{left=1cm,right=1cm}
 \begin{figure}[ht]
  \centering
   \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.32]{GammaR.png}
-	\includegraphics[scale=0.32]{GammaQ.png}
+	\includegraphics[scale=0.25]{GammaR.png}
+	\includegraphics[scale=0.25]{GammaQ.png}
 	Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs un jugador random y vs otro jugador QLearner). 
   \end{minipage}
 \end{figure}
 \begin{figure}[ht]
   \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.32]{EpsilonR.png}
-	\includegraphics[scale=0.32]{EpsilonQ.png}
+	\includegraphics[scale=0.25]{EpsilonR.png}
+	\includegraphics[scale=0.25]{EpsilonQ.png}
 	En este caso, no  hay un claro valor óptimo. Sin embargo elegimos seguir con $\epsilon=0.2$ ya que en ambos casos termina segundo en cuanto a la cantidad de victorias después de un millón de iteraciones.
   \end{minipage}
 \end{figure}
 \begin{figure}[ht]
   \begin{minipage}[c]{1\textwidth}
-	\includegraphics[scale=0.32]{AlphaR.png}
-	\includegraphics[scale=0.32]{AlphaQ.png}
-	\includegraphics[trim=230mm 185mm 13mm 90mm, clip, scale=2.5]{AlphaR.png}
-	\includegraphics[trim=235mm 125mm 0mm 150mm, clip, scale=2.5]{AlphaQ.png}
+	\includegraphics[scale=0.25]{AlphaR.png}
+	\includegraphics[scale=0.25]{AlphaQ.png}
+	\includegraphics[trim=230mm 185mm 13mm 90mm, clip, scale=2]{AlphaR.png}
+	\includegraphics[trim=235mm 125mm 0mm 150mm, clip, scale=2]{AlphaQ.png}
 	Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.
   \end{minipage}
 \end{figure}
-\restoregeometry
 
 
 \subsection{Experimentos con parámetros ajustados}
