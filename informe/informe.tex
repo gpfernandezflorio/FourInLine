@@ -67,8 +67,9 @@ A continuación se muestran los resultados obtenidos.
 	\includegraphics[scale=0.25]{Initial/QvR.png}
 	\includegraphics[scale=0.25]{Initial/QvQ.png}
   \end{minipage}
-  \caption{Proporción de victorias de cada jugador a medida que se van entrenando. Podemos ver como, al jugar contra un jugador Random, el jugador QLP aprende una estrategia para vencerlo y a partir de cierto punto, pareciera ganar la mayor parte de las veces, con lo cuál, su proporción de victorias sólo aumenta. En el caso de los dos jugadores QLP, parecieran retroalimentarse de forma que ambos tienden a ganar el $50\%$ de las veces. A diferencia de lo que se observó en el caso del \texttt{Ta-Te-Ti}, el ratio de empates es muy bajo.}
 \end{figure}
+
+En los gráficos podemos observar la proporción de victorias de cada jugador a medida que se van entrenando. De esta forma podemos ver como, al jugar contra un jugador Random, el jugador QLP aprende una estrategia para vencerlo y a partir de cierto punto, pareciera ganar la mayor parte de las veces, con lo cuál, su proporción de victorias sólo aumenta. En el caso de los dos jugadores QLP, parecieran retroalimentarse de forma que ambos tienden a ganar el $50\%$ de las veces. A diferencia de lo que se observó en el caso del \texttt{Ta-Te-Ti}, el ratio de empates es muy bajo.
 
 
 \subsection{Ajuste de parámetros}
@@ -78,33 +79,40 @@ Experimentamos variando los parámetros $\alpha$, $\gamma$ y $\epsilon$ por sepa
 Cabe aclarar que mientras variamos un parámetro del modelo, los otros dos se fijan también en los valores por defecto ya mencionados.
 
 \subsubsection{Experimentacion con Gamma}
+
 \begin{figure}[H]
  \centering
   \begin{minipage}[c]{1\textwidth}
 	\includegraphics[scale=0.2]{GammaR.png}
 	\includegraphics[scale=0.2]{GammaQ.png}
-	\caption{Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs. un jugador Random y vs. otro jugador QLearner). Si bien se recomienda no usar $\gamma = 1$, en nuestro caso es posible hacerlo ya que no puede diverger el valor de Q para un estado ya que el tablero es finito. }
   \end{minipage}
 \end{figure}
+
+Aquí observamos que el mejor valor que puede tomar $\gamma = 1$ ya que tiene mayor cantidad de victorias y tiene un aprendizaje más rápido en ambas competencias (vs. un jugador Random y vs. otro jugador QLearner). Si bien se recomienda no usar $\gamma = 1$, en nuestro caso es posible hacerlo ya que no puede diverger el valor de Q para un estado ya que el tablero es finito.
+
 \subsubsection{Experimentacion con Alpha}
+
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
   \includegraphics[scale=0.25]{AlphaR.png}
   \includegraphics[scale=0.25]{AlphaQ.png}
   \includegraphics[trim=230mm 185mm 13mm 90mm, clip, scale=2]{AlphaR.png}
   \includegraphics[trim=235mm 125mm 0mm 150mm, clip, scale=2]{AlphaQ.png}
-  \caption{Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.}
   \end{minipage}
 \end{figure}
+
+Variando $\alpha$ hay una diferencia sútil en los distintos modelos pero el mejor valor es $\alpha=0.3$. También se puede observar que con $\alpha=0$, el modelo se comporta como un jugador Random, algo esperable ya que es el caso en que no hay exploración.
+
 \subsubsection{Experimentacion con Epsilon}
+
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
 	\includegraphics[scale=0.2]{EpsilonR.png}
 	\includegraphics[scale=0.2]{EpsilonQ.png}
-	\caption{En este caso, no  hay un claro valor óptimo. Sin embargo elegimos seguir con $\epsilon=0.2$ ya que en ambos casos termina segundo en cuanto a la cantidad de victorias después de un millón de iteraciones.}
   \end{minipage}
 \end{figure}
 
+En este caso, no hay un claro valor óptimo. Sin embargo elegimos seguir con $\epsilon=0.2$ ya que en ambos casos termina segundo en cuanto a la cantidad de victorias después de un millón de iteraciones.
 
 \subsection{Experimentos con parámetros ajustados}
 
@@ -167,10 +175,11 @@ En este caso queremos ver si cambia el aprendizaje según el orden de entrenamie
 Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno Random y con un QLearner. Lo que suponemos que está generando esto es que en el entrenamiento con el Random desaprende lo visto anteriormente logrando así una peor performance.
 
 
-\subsubsection{Experimento 3(QQ vs QR vs QS)}
+\subsubsection{Experimento 3}
 
-Dado que queríamos seguir mejorando el jugador QLearner, nos propusimos agregar un modelo de jugador más inteligente para que lo entrene.  Realizamos entonces un jugador , que llamaremos SQLearner, que aprende como un QLearner pero antes de realizar una movida primero se fija si puede ganar, en ese caso inserta la ficha en la posición ganadora. En caso contrario, se fija si tiene que insertar una ficha para no perder con una jugada del rival. Si tampoco es el caso, realiza una jugada como cualquier QLearner.
-En los siguientes gráficos mostramos los modelos que entrenamos y cómo compiten entre ellos:
+Dado que queríamos seguir mejorando el QLP, nos propusimos agregar un modelo de jugador más inteligente para que lo entrene. Realizamos entonces un jugador, que llamaremos SQLearnerPlayer o SQLP, que aprende como un QLearner pero antes de realizar una movida primero se fija si puede ganar, en ese caso inserta la ficha en la posición ganadora. En caso contrario, se fija si tiene que insertar una ficha para no perder con una jugada del rival. Si tampoco es el caso, realiza una jugada como cualquier QLearner.
+
+En los siguientes gráficos mostramos los resultados del entrenamiento y de la competencia entre ellos:
 
 
 \begin{figure}[H]
@@ -179,10 +188,12 @@ En los siguientes gráficos mostramos los modelos que entrenamos y cómo compite
   \includegraphics[scale=0.3]{QQvsQR.png}
   \includegraphics[scale=0.3]{QRvsQS.png}
   \includegraphics[scale=0.3]{QQvsQS.png}
-  \caption{A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dio un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
-  Otra sorpresa es que el jugador entrenado con Random genera más victorias que el entrenado con un QLearner cuando compiten contra el SQLearner.}
   \end{minipage}
 \end{figure}
+
+A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dio un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
+
+Otra resultado que no esperabamos, es que el jugador entrenado con Random genera más victorias que el entrenado con un QLearner cuando compiten contra el SQLearner.
 
 
 %Ideas que no llegamos a hacer ???
