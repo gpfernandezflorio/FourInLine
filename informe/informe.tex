@@ -40,7 +40,7 @@ El primer paso para desarrollar un algoritmo Q-Learning es definir el espacio de
 En nuestro caso, cada configuración posible del tablero es un estado, es decir guardamos para cada posición del tablero si hay una ficha y de qué jugador. Muchos de esos estados son inalcanzables, ya que toda ficha debe estar inmediatamente por encima de otra ficha. Tampoco consideramos estados en los que hay cuatro fichas alineadas (ya sea de forma vertical, horizontal o diagonal), ya que en caso de suceder esto ya hay un ganador y el juego no continua.
 Cada acción se corresponde con insertar una ficha en alguna de las columnas. La ficha será asignada a la fila inmediatamente superior a la fila donde estaba la ficha más arriba en la misma columna. En lugar de almacenar los estados como matrices, mantenemos un arreglo de Columnas, donde cada Columna no es más que una lista de caracteres, inicialmente vacía. Insertar una ficha en la columna $x$, consiste en agregar un caracter a la $x$-ésima lista del arreglo.
 
-Al elegir esta forma de representacion del tablero conseguimos que no sea posible realizar movimientos invalidos, ya que siempre vamos a estar colocando fichas sobre otras fichas o sobre el fondo de la columna. Ademas, al no representar los lugares vacios el tablero ocupa a priori ocupa menos lugar en memoria, tomando como comparación la representacion matricial.
+Al elegir esta forma de representacion del tablero conseguimos que no sea posible realizar movimientos inválidos, ya que siempre vamos a estar colocando fichas sobre otras fichas o sobre el fondo de la columna. Ademas, al no representar los lugares vacíos el tablero ocupa a priori ocupa menos lugar en memoria, tomando como comparación la representación matricial.
 
 
 Las recompensas a las acciones tomadas se otorgan después de que juegue el rival, excepto en los casos en los que la partida finaliza.
@@ -57,7 +57,7 @@ $\epsilon$,  $\gamma$, $\alpha$, recompensa por ganar(perder o empatar) el parti
 \subsection{Experimentación Inicial}
 
 
-Primero hicimos competir un Q-Learning Player (apartir de ahora QLP) contra un jugador Random y luego contra otro QLP. Para esta experimentación utilizamos los mismo parámetros que se usan en el ejemplo del \texttt{Ta-Te-Ti}, los cuales apartir de ahora llamamos parámetros por defecto. Estos parámetros por defecto son: $\alpha=0.3$,$\gamma=0.9$, $\epsilon=0.2$.
+Primero hicimos competir un Q-Learning Player (a partir de ahora QLP) contra un jugador Random y luego contra otro QLP. Para esta experimentación utilizamos los mismo parámetros que se usan en el ejemplo del \texttt{Ta-Te-Ti}, los cuales a partir de ahora llamamos parámetros por defecto. Estos parámetros por defecto son: $\alpha=0.3$,$\gamma=0.9$, $\epsilon=0.2$.
 
 A continuación se muestran los resultados obtenidos.
 
@@ -122,27 +122,27 @@ Luego una vez que ya definidos nuestros parámetros ($\alpha=0.3$, $\gamma=1.0$,
 ¿Cambia la performance de un jugador si se entrena en distinto orden con un Random y después con un QLearner?\\
 ¿Es mejor un jugador si se lo entrena con otro ``mejor''?\\
 
-Entonces para atacar estas preguntas e intentar responderlas se nos ocurrio realizar los siguientes experimentos:
+Entonces para atacar estas preguntas e intentar responderlas se nos ocurrió realizar los siguientes experimentos:
 
 \begin{figure}[H]
   \begin{minipage}[c]{1\textwidth}
     \begin{center}
     \includegraphics[scale=0.5]{E1.png}
-    \includegraphics[scale=0.5]{E2.png}
+    %\includegraphics[scale=0.5]{E2.png}
     \includegraphics[scale=0.5]{E3.png}
     \end{center}
   \end{minipage}
 \end{figure}
 
-En todos los experimentos planteamos primero una fase de entrenamiento, donde entrenamos distintos QLP antes distintos jugadores, donde cada entrenamiento es de 1 millon de iteraciones y luego una fase de competencia, donde enfrentamos a los QLP entrenados entre si, cambiando los parámetros del modelo para que no aprendan mas y juegan 10 mil iteraciones.
+En todos los experimentos planteamos primero una fase de entrenamiento, donde entrenamos distintos QLP antes distintos jugadores, donde cada entrenamiento es de 1 millón de iteraciones y luego una fase de competencia, donde enfrentamos a los QLP entrenados entre si, cambiando los parámetros del modelo para que no aprendan más y juegan 10 mil iteraciones.
 
 En el primer experimento, el de la izquierda de la figura, entrenamos dos QLP uno contra otro QLP y otro contra un Random y luego compiten entre si.\\
 
-En el segundo experimento, el del medio de la figura, extendemos el experimento anterior agrandando la fase de entrenamiento, haciendo que cada QLP entrenado vuelva a entrenar pero contra el jugador que no le habia tocado en el caso anterior. Es decir tenemos por un lado un QLP entrenado contra otro QLP y luego con un Random y por otro lado un QLP entrenado contra un Random y contra otro QLP. Luego ponemos a competir estos dos QLP entrenados.\\
+%En el segundo experimento, el del medio de la figura, extendemos el experimento anterior agrandando la fase de entrenamiento, haciendo que cada QLP entrenado vuelva a entrenar pero contra el jugador que no le habia tocado en el caso anterior. Es decir tenemos por un lado un QLP entrenado contra otro QLP y luego con un Random y por otro lado un QLP entrenado contra un Random y contra otro QLP. Luego ponemos a competir estos dos QLP entrenados.\\
 
-Por ultimo en el tercer experimento, incluimos un nuevo tipo de jugador SmartQLearnerPlayer y hacemos una experimentacion similar al experimento uno pero agregando un QLP, que entrena contra este SQLP y luego compiten los tres QLP entre si.\\
+Por último, en el tercer experimento, incluimos un nuevo tipo de jugador SmartQLearnerPlayer y hacemos una experimentación similar al experimento uno, pero agregando un QLP, que entrena contra este SQLP y luego compiten los tres QLP entre si.\\
 
-Por un tema de simplicidad nos tomamos la libertad de abreviar los nombres de los jugadores entrenados, entonces por ejemplo al referenciar QQ, nos referimos a un QLP entrenado contra otro QLP, o por ejemplo QRQ, nos referimos a un QLP entrenado contra un Random y luego contra otro QLP y asi todas las combinaciones posibles.
+Por un tema de simplicidad nos tomamos la libertad de abreviar los nombres de los jugadores entrenados, entonces por ejemplo al referenciar QQ, nos referimos a un QLP entrenado contra otro QLP, o por ejemplo QRQ, nos referimos a un QLP entrenado contra un Random y luego contra otro QLP y así todas las combinaciones posibles.
 
 
 \subsubsection{Experimento 1}
@@ -159,20 +159,20 @@ En este experimento, como dijimos antes, entrenamos un QLP contra un Random y lo
 \end{figure}
 Aquí vemos como el QLP entrenado con otro QLearner (al que llamamos QQ) gana con una amplia diferencia. Creemos que esto se debe a que cuando se entrena con un jugador Random no puede aprender con facilidad que movimientos son buenos y cuales malos, debido a la aleatoriedad de las jugadas del Random. En cambio, el entrenado con un QLearner tiene mayor coherencia en sus movimientos y esto genera un mejor aprendizaje.
 
-\subsubsection{Experimento 2}
+%\subsubsection{Experimento 2}
 
 
-En este caso queremos ver si cambia el aprendizaje según el orden de entrenamiento entre modelos. A cada modelo lo entrenamos con un Random y otro QLearner pero en distinto orden y los hacemos competir:
+%En este caso queremos ver si cambia el aprendizaje según el orden de entrenamiento entre modelos. A cada modelo lo entrenamos con un Random y otro QLearner pero en distinto orden y los hacemos competir:
 
 
-\begin{figure}[H]
-  \begin{minipage}[c]{1\textwidth}
-  \includegraphics[scale=0.2]{E2train.png}
-  \includegraphics[scale=0.45]{QQRvsQRQ.png}
-  \end{minipage}
-\end{figure}
+%\begin{figure}[H]
+%  \begin{minipage}[c]{1\textwidth}
+%  \includegraphics[scale=0.2]{E2train.png}
+%  \includegraphics[scale=0.45]{QQRvsQRQ.png}
+%  \end{minipage}
+%\end{figure}
 
-Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno Random y con un QLearner. Lo que suponemos que está generando esto es que en el entrenamiento con el Random desaprende lo visto anteriormente logrando así una peor performance.
+%Los gráficos muestran una diferencia aún mayor entre un entrenamiento con uno Random y con un QLearner. Lo que suponemos que está generando esto es que en el entrenamiento con el Random desaprende lo visto anteriormente logrando así una peor performance.
 
 
 \subsubsection{Experimento 3}
@@ -191,7 +191,7 @@ En los siguientes gráficos mostramos los resultados del entrenamiento y de la c
   \end{minipage}
 \end{figure}
 
-A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dio un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
+A diferencia de nuetras expectativas entrenar un QLearner con un SQLearner dió un jugador con menos victorias. Esto creemos que se debe a que cuando se entrena con un SQLearner es muy difícil ganar y muchos movimientos se convierten en movimientos malos. En cambio, al generarse pocas victorias se tienen muy pocos movimientos con una recompensa positiva.
 
 Otra resultado que no esperabamos, es que el jugador entrenado con Random genera más victorias que el entrenado con un QLearner cuando compiten contra el SQLearner.
 
